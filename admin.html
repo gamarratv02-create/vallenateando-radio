@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel administrativo | Vallenateando Radio</title>
+<link rel="icon" href="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png"><link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="admin-body">
+<div id="authView" class="admin-wrap auth-box">
+  <div class="admin-panel">
+    <img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" style="width:190px;max-height:100px;object-fit:contain" alt="">
+    <h1>🔐 Iniciar sesión</h1>
+    <p>Panel administrativo de Vallenateando Radio</p>
+    <form id="loginForm" class="form-grid">
+      <label>Correo<input id="email" type="email" required></label>
+      <label>Contraseña<input id="password" type="password" required></label>
+      <button class="btn primary full" type="submit">Entrar</button>
+    </form>
+    <div id="authMsg" class="message hidden"></div>
+    <a href="index.html">← Volver a la página</a>
+  </div>
+</div>
+
+<div id="adminView" class="hidden">
+  <header class="site-header"><div class="container nav-wrap"><strong>Vallenateando Radio — Administración</strong><button class="btn secondary" id="logoutBtn">Cerrar sesión</button></div></header>
+  <main class="admin-wrap">
+    <div class="admin-top"><div><span class="eyebrow">PANEL</span><h1>Administración</h1></div></div>
+
+    <section class="admin-panel">
+      <h2>📅 Programación por fecha</h2>
+      <form id="programForm" class="form-grid">
+        <input type="hidden" id="programId">
+        <label>Fecha<input id="pFecha" type="date" required></label>
+        <label>Hora de inicio<input id="pInicio" type="time" required></label>
+        <label>Hora de finalización<input id="pFin" type="time" required></label>
+        <label>Nombre del programa<input id="pNombre" required></label>
+        <label class="full">Descripción<textarea id="pDesc"></textarea></label>
+        <label>Imagen del programa<input id="pImagen" type="file" accept="image/*"></label>
+        <label>o URL de imagen<input id="pImagenUrl" type="url"></label>
+        <div class="actions full"><button class="btn primary" type="submit">Guardar programa</button><button class="btn secondary" type="button" id="cancelProgram">Cancelar edición</button></div>
+      </form>
+      <hr>
+      <label>Ver programación de fecha<input id="filterDate" type="date"></label>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Horario</th><th>Programa</th><th>Descripción</th><th>Acciones</th></tr></thead><tbody id="programTable"></tbody></table></div>
+    </section>
+
+    <section class="admin-panel">
+      <h2>📰 Noticias</h2>
+      <form id="newsForm" class="form-grid">
+        <input type="hidden" id="newsId">
+        <label>Título<input id="nTitulo" required></label>
+        <label>Categoría<input id="nCategoria" placeholder="Vallenato, Música, Cultura..."></label>
+        <label class="full">Resumen<textarea id="nResumen"></textarea></label>
+        <label class="full">Contenido<textarea id="nContenido" required></textarea></label>
+        <label>Portada<input id="nImagen" type="file" accept="image/*"></label>
+        <label>o URL de portada<input id="nImagenUrl" type="url"></label>
+        <label>Video (YouTube o URL)<input id="nVideo" type="url" placeholder="https://..."></label>
+        <label>Publicar ahora<select id="nPublicado"><option value="true">Sí</option><option value="false">No</option></select></label>
+        <div class="actions full"><button class="btn primary" type="submit">Guardar noticia</button><button class="btn secondary" type="button" id="cancelNews">Cancelar edición</button></div>
+      </form>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Fecha</th><th>Título</th><th>Categoría</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="newsTable"></tbody></table></div>
+    </section>
+
+    <section class="admin-panel">
+      <h2>📢 Publicidad</h2>
+      <form id="adForm" class="form-grid">
+        <input type="hidden" id="adId">
+        <label>Título<input id="aTitulo"></label>
+        <label>Orden<input id="aOrden" type="number" value="0"></label>
+        <label>Imagen<input id="aImagen" type="file" accept="image/*"></label>
+        <label>o URL de imagen<input id="aImagenUrl" type="url"></label>
+        <label>Enlace al hacer clic<input id="aEnlace" type="url"></label>
+        <label>Activo<select id="aActivo"><option value="true">Sí</option><option value="false">No</option></select></label>
+        <div class="actions full"><button class="btn primary" type="submit">Guardar publicidad</button><button class="btn secondary" type="button" id="cancelAd">Cancelar edición</button></div>
+      </form>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Imagen</th><th>Título</th><th>Orden</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="adTable"></tbody></table></div>
+    </section>
+  </main>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>
