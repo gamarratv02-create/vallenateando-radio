@@ -1,10 +1,8 @@
-const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
-const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY";
-const ready=!SUPABASE_URL.includes("TU-PROYECTO")&&!SUPABASE_ANON_KEY.includes("TU_SUPABASE");
-const db=ready?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const ready=!SUPABASE_URL.includes("TU-PROYECTO")&&!SUPABASE_PUBLISHABLE_KEY.includes("TU_SUPABASE");
+const db=ready?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
 const $=s=>document.querySelector(s);
 const msg=(t,err=false)=>{const x=$("#authMsg");x.textContent=t;x.classList.remove("hidden");x.style.background=err?"#ffe9e9":"#f0ebf7"};
-function requireDb(){if(!db){msg("Primero configura SUPABASE_URL y SUPABASE_ANON_KEY en admin.js.",true);return false}return true}
+function requireDb(){if(!db){msg("Primero configura SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en admin.js.",true);return false}return true}
 
 $("#loginForm").onsubmit=async e=>{e.preventDefault();if(!requireDb())return;const {error}=await db.auth.signInWithPassword({email:$("#email").value,password:$("#password").value});if(error)msg(error.message,true);else init()};
 $("#logoutBtn").onclick=()=>db.auth.signOut();
