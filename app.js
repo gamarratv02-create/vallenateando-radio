@@ -1,113 +1,74 @@
-const audio=document.getElementById("radioAudio");
-const playButtons=[document.getElementById("playButton"),document.getElementById("mainPlayButton")].filter(Boolean);
-const volume=document.getElementById("volumeControl");
-const statusEls=[document.getElementById("liveStatus")].filter(Boolean);
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const C=window.APP_CONFIG; const sb=createClient(C.supabaseUrl,C.supabaseKey); const app=document.querySelector('#app'); const audio=document.querySelector('#audio'); const playBtn=document.querySelector('#playBtn'); const menuToggle=document.querySelector('#menuToggle'); const nav=document.querySelector('#mainNav'); document.querySelector('#year').textContent=new Date().getFullYear();
 let hls=null;
+let audioInitialized=false;
+function setupAudio(){ if(audioInitialized) return; audioInitialized=true; if(Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true});hls.loadSource(C.streamUrl);hls.attachMedia(audio);}else{audio.src=C.streamUrl;} }
+setupAudio();
+async function toggle(){try{if(audio.paused){await audio.play();playBtn.textContent='❚❚';document.body.classList.add('playing')}else{audio.pause();playBtn.textContent='▶';document.body.classList.remove('playing')}}catch(e){alert('No fue posible iniciar la señal. Pulsa nuevamente el botón de reproducción.');}}
+playBtn.onclick=toggle; document.querySelector('.big-play')?.addEventListener('click',toggle); document.querySelector('#volume').oninput=e=>audio.volume=Number(e.target.value); audio.volume=.85;
+menuToggle.onclick=()=>nav.classList.toggle('open'); nav.querySelectorAll('a').forEach(a=>a.onclick=()=>nav.classList.remove('open'));
+function esc(s=''){return s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+async function getNews(){let {data}=await sb.from('news').select('*').order('published_at',{ascending:false}).limit(9);return data||[]}
+async function getPrograms(){let d=new Date();let day=d.toLocaleDateString('es-CO',{weekday:'long'});let {data}=await sb.from('programs').select('*').eq('program_date',d.toISOString().slice(0,10)).order('start_time');if(!data?.length){let r=await sb.from('programs').select('*').eq('day_name',day).order('start_time');data=r.data||[]}return data||[]}
+function newsCards(items){return items.length?`<div class="cards">${items.map(n=>`<a class="card" href="#/noticia/${encodeURIComponent(n.slug||n.id)}"><img src="${esc(n.image_url||C.logoUrl)}" alt=""><div class="card-body"><span class="tag">${esc(n.category||'Noticias')}</span><h3>${esc(n.title)}</h3><p>${esc(n.summary||n.content||'')}</p></div></a>`).join('')}</div>`:`<div class="empty">Próximamente publicaremos noticias.</div>`}
+function programs(items){return items.length?`<div class="program-grid">${items.map(p=>`<div class="program"><div class="date">${esc(p.program_date||'Programación')}</div><h3>${esc(p.title||p.name)}</h3><p>${esc((p.start_time||'')+' — '+(p.end_time||''))}</p><p>${esc(p.description||'')}</p></div>`).join('')}</div>`:`<div class="empty">No hay programación cargada para hoy.</div>`}
+async function home(){let [news,progs]=await Promise.all([getNews(),getPrograms()]);app.innerHTML=`<section class="hero"><div class="container hero-grid"><div><span class="kicker">Emisora online · 24/7</span><h1>Vallenateando Radio</h1><p>Conéctate a nuestra señal en vivo y disfruta lo mejor del vallenato, acompañado de información, cultura y contenidos para nuestra audiencia.</p><div class="hero-actions"><button class="btn btn-primary" onclick="document.querySelector('#playBtn').click()">▶ Escuchar en vivo</button><a class="btn" href="#programacion">Ver programación</a></div></div><div class="hero-art"><img src="${C.logoUrl}" alt="Vallenateando Radio"></div></div></section><section class="section"><div class="container"><div class="live-card"><div><span class="live-badge">SEÑAL EN VIVO</span><h2>Ahora estás escuchando Vallenateando Radio</h2><p>Activa el reproductor inferior para escuchar la emisora mientras navegas por la página.</p></div><button class="big-play" onclick="document.querySelector('#playBtn').click()">▶</button></div></div></section><section class="section"><div class="container"><div class="section-head"><div><p>Lo más reciente</p><h2>Noticias</h2></div><a class="btn" href="#noticias">Ver todas</a></div>${newsCards(news)}</div></section><section class="section"><div class="container"><div class="section-head"><div><p>Hoy</p><h2>Programación</h2></div><a class="btn" href="#programacion">Ver agenda</a></div>${programs(progs)}</div></section>`}
+async function live(){app.innerHTML=`<section class="page"><div class="container"><span class="kicker">Señal en vivo</span><h1 class="page-title">Vallenateando Radio en vivo</h1><p class="muted">Escucha nuestra señal online mientras navegas por el sitio.</p><div class="live-card" style="margin-top:24px"><div><span class="live-badge">EN DIRECTO</span><h2>Vallenateando Radio</h2><p>Lo mejor del vallenato, siempre contigo.</p></div><button class="big-play" onclick="document.querySelector('#playBtn').click()">▶</button></div></div></section>`}
+async function schedule(){let p=await getPrograms();app.innerHTML=`<section class="page"><div class="container"><span class="kicker">Agenda</span><h1 class="page-title">Programación de hoy</h1><p class="muted">La agenda se muestra según la fecha actual y puede ser administrada desde “Iniciar sesión”.</p><div style="margin-top:24px">${programs(p)}</div></div></section>`}
+async function news(){let n=await getNews();app.innerHTML=`<section class="page"><div class="container"><span class="kicker">Actualidad</span><h1 class="page-title">Noticias</h1><p class="muted">Información y contenidos de Vallenateando Radio.</p><div style="margin-top:24px">${newsCards(n)}</div></div></section>`}
+async function article(slug){
+  let q=await sb.from('news').select('*').eq('slug',slug).maybeSingle();
+  let n=q.data;
+  if(!n){let r=await sb.from('news').select('*').eq('id',slug).maybeSingle();n=r.data}
+  if(!n){
+    app.innerHTML=`<section class="page"><div class="container"><div class="empty">No encontramos esta noticia.</div></div></section>`;
+    return;
+  }
+  const title=esc(n.title||'Noticias');
+  const category=esc(n.category||'Noticias');
+  const image=esc(n.image_url||C.logoUrl);
+  const date=n.published_at?new Date(n.published_at).toLocaleDateString('es-CO',{dateStyle:'long'}):'';
+  const summary=esc(n.summary||'');
+  const raw=String(n.content||n.summary||'');
+  const paragraphs=raw.split(/\\n\\s*\\n|\\r?\\n/).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');
+  const url=location.href;
+  app.innerHTML=`
+    <section class="article-page">
+      <div class="container article-shell">
+        <div class="article-back"><a href="#noticias">← Volver a noticias</a> <span class="tag">${category}</span></div>
+        <article class="article article-modern">
+          <div class="article-body">
+            <span class="article-kicker">Vallenateando Radio · Noticias</span>
+            <h1>${title}</h1>
+            ${summary?`<p class="article-lead">${summary}</p>`:''}
+            ${date?`<div class="article-meta">Publicado el ${date}</div>`:''}
+          </div>
+          <figure class="article-cover"><img src="${image}" alt="${title}" loading="eager"></figure>
+          <div class="article-body article-copy">
+            <div class="share-row">
+              <button class="share-btn" id="shareNews">↗ Compartir noticia</button>
+              <button class="share-btn light" id="copyNews">⧉ Copiar enlace</button>
+            </div>
+            <div class="content">${paragraphs||'<p>Consulta la información completa de esta noticia.</p>'}</div>
+            ${n.video_url?`<div class="article-video"><video controls playsinline preload="metadata" src="${esc(n.video_url)}"></video></div>`:''}
+            <div class="article-end"><a class="btn btn-primary" href="#noticias">← Ver más noticias</a></div>
+          </div>
+        </article>
+      </div>
+    </section>`;
 
-function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function escapeAttr(v){return escapeHtml(v)}
-function slugify(v){return String(v||"noticia").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,120)}
-function newsUrl(n){return `index.html#/noticia/${encodeURIComponent(n.slug||slugify(n.titulo))}`}
-function setStatus(t){statusEls.forEach(e=>e.textContent=t)}
-function setPlaying(p){
-  playButtons.forEach(b=>{b.textContent=p?"❚❚":"▶ Escuchar en vivo";if(b.id==="playButton")b.textContent=p?"❚❚":"▶"});
-  setStatus(p?"● Señal en vivo reproduciéndose.":"● Señal disponible · Presiona reproducir para escuchar");
+  document.querySelector('#shareNews')?.addEventListener('click',async()=>{
+    try{
+      if(navigator.share) await navigator.share({title:n.title||'Vallenateando Radio',text:n.summary||n.title||'',url});
+      else {await navigator.clipboard.writeText(url); alert('Enlace copiado.');}
+    }catch(e){}
+  });
+  document.querySelector('#copyNews')?.addEventListener('click',async()=>{
+    try{await navigator.clipboard.writeText(url); const b=document.querySelector('#copyNews'); const old=b.textContent; b.textContent='✓ Enlace copiado'; setTimeout(()=>b.textContent=old,1800)}catch(e){alert('No fue posible copiar el enlace.');}
+  });
 }
-function initStream(){
- if(!audio)return;
- if(audio.canPlayType("application/vnd.apple.mpegurl")) audio.src=STREAM_URL;
- else if(window.Hls&&Hls.isSupported()){
-   hls=new Hls({enableWorker:true,lowLatencyMode:true});
-   hls.loadSource(STREAM_URL);hls.attachMedia(audio);
-   hls.on(Hls.Events.ERROR,(_,data)=>{
-     if(data.fatal)setStatus("No fue posible cargar la señal. Presiona reproducir nuevamente.");
-   });
- }else audio.src=STREAM_URL;
-}
-async function toggleAudio(){
- if(!audio)return;
- try{
-   if(audio.paused){await audio.play();setPlaying(true)}
-   else{audio.pause();setPlaying(false)}
- }catch(e){setStatus("El navegador bloqueó la reproducción. Presiona el botón nuevamente.")}
-}
-playButtons.forEach(b=>b.addEventListener("click",toggleAudio));
-audio?.addEventListener("play",()=>setPlaying(true));
-audio?.addEventListener("pause",()=>setPlaying(false));
-audio?.addEventListener("error",()=>setStatus("La señal no está disponible en este momento."));
-if(volume){volume.addEventListener("input",()=>audio.volume=Number(volume.value));audio.volume=.8}
-document.getElementById("menuToggle")?.addEventListener("click",()=>document.getElementById("mainNav")?.classList.toggle("open"));
-
-function localToday(){
- const d=new Date();
- return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-async function loadCurrentProgram(){
- const bottom=document.getElementById("bottomProgram"),hero=document.getElementById("heroProgram"),desc=document.getElementById("heroProgramDesc");
- if(!bottom&&!hero)return;
- const date=localToday(), now=new Date();
- const {data}=await supabaseClient.from("programacion").select("*").eq("fecha",date).order("hora_inicio",{ascending:true});
- let current=null;
- (data||[]).forEach(p=>{
-   const start=new Date(`${p.fecha}T${p.hora_inicio}`);
-   const end=new Date(`${p.fecha}T${p.hora_fin}`);
-   if(now>=start&&now<=end)current=p;
- });
- const title=current?.titulo||"Vallenateando Radio";
- if(bottom)bottom.textContent=title;
- if(hero)hero.textContent=title;
- if(desc)desc.textContent=current?.descripcion||"Señal de audio en vivo";
-}
-function renderCard(n,small=false){
- const img=n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:"";
- return `<article class="news-card ${small?"small":""}"><a href="${newsUrl(n)}">${img}<div class="news-card-body"><span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span><h3>${escapeHtml(n.titulo||"Sin título")}</h3><p>${escapeHtml((n.resumen||n.contenido||"").slice(0,155))}</p><div class="card-meta"><span>${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):""}</span><b>LEER NOTICIA</b><i>→</i></div></div></a></article>`;
-}
-async function getNews(limit=30){
- const {data,error}=await supabaseClient.from("noticias").select("*").order("created_at",{ascending:false}).limit(limit);
- return error?[]:(data||[]);
-}
-async function loadHome(){
- const featured=document.getElementById("featuredNews"),latest=document.getElementById("latestNews");
- if(!featured&&!latest)return;
- const news=await getNews(12);
- if(!news.length){
-   if(featured)featured.innerHTML="<div class='empty-state'>Aún no hay noticias publicadas.</div>";
-   if(latest)latest.innerHTML="";
-   return;
- }
- const [a,b,c]=news;
- if(featured){
-   featured.innerHTML=`<div class="featured-main"><a href="${newsUrl(a)}">${a.imagen_url?`<img src="${escapeAttr(a.imagen_url)}" alt="">`:""}<div class="featured-overlay"><span class="news-tag">${escapeHtml(a.categoria||"Actualidad")}</span><h2>${escapeHtml(a.titulo)}</h2><p>${escapeHtml(a.resumen||"")}</p></div></a></div><div class="featured-side">${[b,c].filter(Boolean).map(n=>`<article><a href="${newsUrl(n)}">${n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:""}<div><span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span><h3>${escapeHtml(n.titulo)}</h3><small>${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):""}</small></div></a></article>`).join("")}</div>`;
- }
- if(latest)latest.innerHTML=news.slice(0,8).map(n=>renderCard(n,true)).join("");
- const ticker=document.getElementById("tickerText");if(ticker)ticker.textContent=a.titulo;
-}
-let allNews=[];
-function renderAllNews(){
- const grid=document.getElementById("allNewsGrid");if(!grid)return;
- const q=(document.getElementById("newsSearch")?.value||"").toLowerCase().trim();
- const cat=document.getElementById("newsCategory")?.value||"";
- const filtered=allNews.filter(n=>(!cat||n.categoria===cat)&&(!q||`${n.titulo} ${n.resumen} ${n.contenido} ${n.categoria}`.toLowerCase().includes(q)));
- grid.innerHTML=filtered.length?filtered.map(n=>renderCard(n)).join(""):"<div class='empty-state'>No encontramos noticias con esos filtros.</div>";
-}
-async function loadNewsPage(){
- if(!document.getElementById("allNewsGrid"))return;
- allNews=await getNews(100);renderAllNews();
- document.getElementById("newsSearch")?.addEventListener("input",renderAllNews);
- document.getElementById("newsCategory")?.addEventListener("change",renderAllNews);
- document.querySelectorAll(".category-pills button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".category-pills button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById("newsCategory").value=b.dataset.cat;renderAllNews()}));
-}
-async function renderArticleFromHash(){
- const article=document.getElementById("article"),route=document.getElementById("articleRoute"),home=document.getElementById("homeContent");
- if(!article||!route)return;
- const match=decodeURIComponent(location.hash).match(/^#\/noticia\/(.+)$/);
- if(!match){route.classList.add("route-hidden");if(home)home.style.display="block";return}
- route.classList.remove("route-hidden");if(home)home.style.display="none";
- const slug=match[1];
- const news=await getNews(100);
- const n=news.find(x=>(x.slug||slugify(x.titulo))===slug);
- if(!n){article.innerHTML="<div class='empty-state'>No se encontró esta noticia.</div>";return}
- document.title=`${n.titulo} | Vallenateando Radio`;
- article.innerHTML=`<div class="article-kicker">${escapeHtml(n.categoria||"Actualidad")}</div><h1>${escapeHtml(n.titulo)}</h1><div class="article-date">${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"}):""}</div>${n.imagen_url?`<img class="article-image" src="${escapeAttr(n.imagen_url)}" alt="">`:""}${n.resumen?`<p class="article-lead">${escapeHtml(n.resumen)}</p>`:""}<div class="article-body">${escapeHtml(n.contenido||"").replace(/\n/g,"<br>")}</div>${n.video_url?`<div class="article-video"><a href="${escapeAttr(n.video_url)}" target="_blank" rel="noopener">▶ Ver video</a></div>`:""}<a class="back-news" href="noticias.html">← Volver a noticias</a>`;
-}
-initStream();loadCurrentProgram();loadHome();loadNewsPage();renderArticleFromHash();window.addEventListener("hashchange",renderArticleFromHash);
+async function contact(){app.innerHTML=`<section class="page"><div class="container"><span class="kicker">Estamos para escucharte</span><h1 class="page-title">Contacto</h1><div class="contact-box" style="margin-top:24px"><div><h2>Vallenateando Radio</h2><p>Comunícate con nosotros para información, publicidad, alianzas y contenidos.</p></div><div><div class="contact-item">📱 <strong>WhatsApp / Teléfono</strong><br><a href="https://wa.me/573013799517" target="_blank">${C.contactPhone}</a></div><div class="contact-item" style="margin-top:12px">✉️ <strong>Correo electrónico</strong><br><a href="mailto:${C.contactEmail}">${C.contactEmail}</a></div></div></div></div></section>`}
+async function admin(){let {data:{session}}=await sb.auth.getSession(); if(!session){app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administración</span><h1>Iniciar sesión</h1><p class="muted">Ingresa con el usuario administrador creado en Supabase.</p><form id="login"><label>Correo</label><input id="email" type="email" required><label>Contraseña</label><input id="pass" type="password" required><div class="form-actions"><button class="btn btn-primary">Entrar</button></div><p id="loginMsg" class="muted"></p></form></div></div></section>`;document.querySelector('#login').onsubmit=async e=>{e.preventDefault();let r=await sb.auth.signInWithPassword({email:email.value,password:pass.value});if(r.error)loginMsg.textContent=r.error.message;else admin()};return}app.innerHTML=`<section class="page"><div class="container"><div class="section-head"><div><span class="kicker">Panel privado</span><h1 class="page-title">Administrador</h1><p class="muted">Publica noticias y administra la programación sin editar el código.</p></div><button class="btn" id="logout">Cerrar sesión</button></div><div class="cards"><a class="card" href="#admin-noticia"><div class="card-body"><span class="tag">Contenido</span><h3>Nueva noticia</h3><p>Publica título, categoría, resumen, imagen y video.</p></div></a><a class="card" href="#admin-programa"><div class="card-body"><span class="tag">Agenda</span><h3>Nueva programación</h3><p>Asigna fecha y horario a cada programa.</p></div></a></div></div></section>`;document.querySelector('#logout').onclick=()=>sb.auth.signOut().then(admin)}
+async function adminNews(){if(!(await sb.auth.getSession()).data.session)return admin();app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Publicar noticia</h1><form id="newsForm"><label>Título</label><input id="nt" required><label>Slug (URL)</label><input id="ns" placeholder="mi-noticia"><label>Categoría</label><input id="nc" value="Noticias"><label>Resumen</label><textarea id="nr"></textarea><label>Contenido</label><textarea id="nco" required></textarea><label>URL de imagen</label><input id="ni" type="url"><label>URL de video (opcional)</label><input id="nv" type="url"><div class="form-actions"><button class="btn btn-primary">Publicar</button><a class="btn" href="#admin">Volver</a></div><p id="msg" class="muted"></p></form></div></div></section>`;document.querySelector('#newsForm').onsubmit=async e=>{e.preventDefault();let slug=ns.value.trim()||nt.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');let r=await sb.from('news').insert({title:nt.value,slug,category:nc.value,summary:nr.value,content:nco.value,image_url:ni.value,video_url:nv.value,published_at:new Date().toISOString()});msg.textContent=r.error?r.error.message:'Noticia publicada correctamente.';if(!r.error)e.target.reset()}}
+async function adminProgram(){if(!(await sb.auth.getSession()).data.session)return admin();app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Agregar programación</h1><form id="pf"><label>Programa</label><input id="pt" required><label>Fecha</label><input id="pd" type="date" required><label>Hora de inicio</label><input id="ps" type="time" required><label>Hora de finalización</label><input id="pe" type="time" required><label>Descripción</label><textarea id="px"></textarea><label>Imagen (URL opcional)</label><input id="pi" type="url"><div class="form-actions"><button class="btn btn-primary">Guardar programación</button><a class="btn" href="#admin">Volver</a></div><p id="pm" class="muted"></p></form></div></div></section>`;document.querySelector('#pf').onsubmit=async e=>{e.preventDefault();let r=await sb.from('programs').insert({title:pt.value,program_date:pd.value,start_time:ps.value,end_time:pe.value,description:px.value,image_url:pi.value,day_name:new Date(pd.value+'T12:00:00').toLocaleDateString('es-CO',{weekday:'long'})});pm.textContent=r.error?r.error.message:'Programación guardada correctamente.';if(!r.error)e.target.reset()}}
+async function route(){let h=location.hash||'#inicio';if(h.startsWith('#/noticia/'))return article(decodeURIComponent(h.split('/noticia/')[1]));if(h==='#inicio'||h==='#/')return home();if(h==='#en-vivo')return live();if(h==='#programacion')return schedule();if(h==='#noticias')return news();if(h==='#contacto')return contact();if(h==='#admin')return admin();if(h==='#admin-noticia')return adminNews();if(h==='#admin-programa')return adminProgram();return home()}window.addEventListener('hashchange',route);route();
