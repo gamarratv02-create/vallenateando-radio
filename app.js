@@ -1,68 +1,77 @@
-const STREAM_URL = "https://djp.sytes.net/hls/vallenateandoradio/live.m3u8";
-const supabaseReady = !SUPABASE_URL.includes("TU-PROYECTO") && !SUPABASE_PUBLISHABLE_KEY.includes("TU_SUPABASE");
-const db = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
-
-const $ = s => document.querySelector(s);
-const audio = $("#radioAudio");
+const audio = document.getElementById("radioAudio");
+const playButtons = [document.getElementById("playButton"), document.getElementById("mainPlayButton")];
+const statusEl = document.getElementById("liveStatus");
+const volume = document.getElementById("volumeControl");
 let hls = null;
 
-function setupAudio(){
-  audio.volume = 1;
-  if(audio.canPlayType("application/vnd.apple.mpegurl")) audio.src = STREAM_URL;
-  else if(window.Hls && Hls.isSupported()){ hls = new Hls({enableWorker:true}); hls.loadSource(STREAM_URL); hls.attachMedia(audio); }
-  else audio.src = STREAM_URL;
+function setButtons(playing){
+  playButtons.forEach(b => { if(b) b.textContent = playing ? "❚❚" : "▶"; });
+  if(statusEl) statusEl.textContent = playing ? "🔴 Señal en vivo reproduciéndose." : "Presiona reproducir para escuchar.";
 }
-async function playRadio(){
-  try{ await audio.play(); $("#playBtn").textContent="❚❚"; $("#heroPlay").textContent="❚❚ Pausar"; }
-  catch(e){ alert("El navegador bloqueó la reproducción automática. Pulsa nuevamente Escuchar en vivo."); }
+function initStream(){
+  if(audio.canPlayType("application/vnd.apple.mpegurl")){
+    audio.src = STREAM_URL;
+  } else if(window.Hls && Hls.isSupported()){
+    hls = new Hls({enableWorker:true});
+    hls.loadSource(STREAM_URL);
+    hls.attachMedia(audio);
+    hls.on(Hls.Events.ERROR,(_,data)=>{
+      if(data.fatal && statusEl) statusEl.textContent="No fue posible cargar la señal. Intenta nuevamente.";
+    });
+  } else audio.src = STREAM_URL;
 }
-function pauseRadio(){audio.pause();$("#playBtn").textContent="▶";$("#heroPlay").textContent="▶ Escuchar en vivo";}
-$("#playBtn").onclick=()=>audio.paused?playRadio():pauseRadio();
-$("#heroPlay").onclick=()=>audio.paused?playRadio():pauseRadio();
-$("#volume").oninput=e=>audio.volume=Number(e.target.value);
-$("#muteBtn").onclick=()=>{audio.muted=!audio.muted;$("#muteBtn").textContent=audio.muted?"🔇":"⋮"};
-$("#menuBtn").onclick=()=>$("#mainNav").classList.toggle("open");
-$("#year").textContent=new Date().getFullYear();
+async function toggleAudio(){
+  try{
+    if(audio.paused){ await audio.play(); setButtons(true); }
+    else { audio.pause(); setButtons(false); }
+  }catch(e){
+    if(statusEl) statusEl.textContent="El navegador bloqueó la reproducción. Presiona nuevamente.";
+  }
+}
+playButtons.forEach(b=>b&&b.addEventListener("click",toggleAudio));
+audio.addEventListener("play",()=>setButtons(true));
+audio.addEventListener("pause",()=>setButtons(false));
+if(volume){ volume.addEventListener("input",()=>audio.volume=Number(volume.value)); audio.volume=.8; }
 
-function localDate(){const d=new Date();return d.toLocaleDateString("en-CA",{timeZone:"America/Bogota"});}
-function formatTime(t){return t?.slice(0,5)||"";}
-function formatDate(d){return new Date(d+"T12:00:00").toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"});}
+const menuToggle=document.getElementById("menuToggle"), nav=document.getElementById("mainNav");
+menuToggle?.addEventListener("click",()=>nav.classList.toggle("open"));
+nav?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
 
-async function loadSchedule(date){
-  const box=$("#scheduleList"); box.innerHTML='<div class="empty">Cargando programación...</div>';
-  if(!db){box.innerHTML='<div class="empty">Configura Supabase en app.js para activar la programación.</div>';return;}
-  const {data,error}=await db.from("programacion").select("*").eq("fecha",date).order("hora_inicio",{ascending:true});
-  if(error){box.innerHTML='<div class="empty">No se pudo cargar la programación.</div>';console.error(error);return;}
-  if(!data?.length){box.innerHTML='<div class="empty">No hay programación registrada para esta fecha.</div>';$("#nowProgram").textContent="Vallenateando Radio";return;}
-  box.innerHTML=data.map(p=>`<article class="schedule-item"><div class="schedule-time">${formatTime(p.hora_inicio)} – ${formatTime(p.hora_fin)}</div><div><div class="schedule-title">${escapeHtml(p.nombre_programa)}</div><div class="schedule-desc">${escapeHtml(p.descripcion||"")}</div></div>${p.imagen_url?`<img src="${safeUrl(p.imagen_url)}" alt="">`:""}</article>`).join("");
-  updateCurrentProgram(data);
-}
-function updateCurrentProgram(items){
+function today(){return new Date().toISOString().slice(0,10)}
+const dateInput=document.getElementById("scheduleDate");
+if(dateInput){dateInput.value=today();dateInput.addEventListener("change",loadSchedule)}
+
+async function loadSchedule(){
+  const list=document.getElementById("scheduleList"), current=document.getElementById("currentProgram");
+  if(!list)return;
+  list.innerHTML="<div class='empty-state'>Cargando programación...</div>";
+  const date=dateInput?.value||today();
+  const {data,error}=await supabaseClient.from("programacion").select("*").eq("fecha",date).order("hora_inicio");
+  if(error){list.innerHTML="<div class='empty-state'>No se pudo cargar la programación.</div>";return}
+  if(!data?.length){current.textContent="No hay programación publicada para esta fecha.";list.innerHTML="<div class='empty-state'>Agrega programas desde el panel administrativo.</div>";return}
   const now=new Date();
-  const mins=now.getHours()*60+now.getMinutes();
-  const current=items.find(p=>toMin(p.hora_inicio)<=mins && mins<toMin(p.hora_fin));
-  $("#nowProgram").textContent=current?.nombre_programa||"Vallenateando Radio";
+  let active=null;
+  list.innerHTML=data.map(p=>{
+    const s=`${p.fecha}T${p.hora_inicio}`, e=`${p.fecha}T${p.hora_fin}`;
+    if(date===today() && now>=new Date(s) && now<=new Date(e)) active=p;
+    return `<article class="schedule-item"><div class="schedule-time">${p.hora_inicio} – ${p.hora_fin}</div><div><strong>${escapeHtml(p.titulo||"Programa")}</strong><div class="schedule-desc">${escapeHtml(p.descripcion||"")}</div></div></article>`;
+  }).join("");
+  current.textContent=active?`AHORA: ${active.titulo}`:"Programación del día";
+  const bottom=document.getElementById("bottomProgram"), main=document.getElementById("mainPlayerText");
+  if(active){if(bottom)bottom.textContent=active.titulo;if(main)main.textContent=active.titulo;}
 }
-function toMin(t){const [h,m]=t.split(":").map(Number);return h*60+m;}
-
 async function loadNews(){
-  const box=$("#newsGrid");
-  if(!db){box.innerHTML='<div class="empty">Configura Supabase para mostrar noticias.</div>';return;}
-  const {data,error}=await db.from("noticias").select("*").eq("publicado",true).order("fecha_publicacion",{ascending:false}).limit(6);
-  if(error){box.innerHTML='<div class="empty">No se pudieron cargar las noticias.</div>';return;}
-  if(!data?.length){box.innerHTML='<div class="empty">Aún no hay noticias publicadas.</div>';return;}
-  box.innerHTML=data.map(n=>`<article class="news-card">${n.imagen_url?`<img src="${safeUrl(n.imagen_url)}" alt="">`:""}<div class="news-body"><div class="news-date">${n.fecha_publicacion?formatDate(n.fecha_publicacion.slice(0,10)):""}</div><h3>${escapeHtml(n.titulo)}</h3><p>${escapeHtml(n.resumen||"")}</p>${n.video_url?`<a href="${safeUrl(n.video_url)}" target="_blank" rel="noopener">▶ Ver video</a>`:""}</div></article>`).join("");
+  const grid=document.getElementById("newsGrid"); if(!grid)return;
+  const {data,error}=await supabaseClient.from("noticias").select("*").order("created_at",{ascending:false}).limit(9);
+  if(error||!data?.length){grid.innerHTML="<div class='empty-state'>Aún no hay noticias publicadas.</div>";return}
+  grid.innerHTML=data.map(n=>`<article class="news-card">${n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:""}<div class="news-card-body"><span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span><h3>${escapeHtml(n.titulo||"Sin título")}</h3><p>${escapeHtml((n.resumen||n.contenido||"").slice(0,180))}</p></div></article>`).join("");
 }
 async function loadAds(){
-  const box=$("#adsGrid");
-  if(!db){box.innerHTML='<div class="empty">Configura Supabase para mostrar publicidad.</div>';return;}
-  const {data,error}=await db.from("publicidad").select("*").eq("activo",true).order("orden",{ascending:true});
-  if(error||!data?.length){box.innerHTML='<div class="empty">Espacio disponible para anunciantes.</div>';return;}
-  box.innerHTML=data.map(a=>`<div class="ad-card">${a.enlace_url?`<a href="${safeUrl(a.enlace_url)}" target="_blank" rel="noopener">`:""}<img src="${safeUrl(a.imagen_url)}" alt="${escapeHtml(a.titulo||"Publicidad")}">${a.enlace_url?"</a>":""}</div>`).join("");
+  const grid=document.getElementById("adsGrid"); if(!grid)return;
+  const {data,error}=await supabaseClient.from("publicidad").select("*").order("created_at",{ascending:false}).limit(8);
+  if(error||!data?.length){grid.innerHTML="<div class='empty-state'>Aún no hay espacios publicitarios publicados.</div>";return}
+  grid.innerHTML=data.map(a=>`<article class="ad-card">${a.imagen_url?`<img src="${escapeAttr(a.imagen_url)}" alt="">`:""}<div class="ad-body"><strong>${escapeHtml(a.titulo||"Publicidad")}</strong><p>${escapeHtml(a.descripcion||"")}</p></div></article>`).join("");
 }
-function escapeHtml(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
-function safeUrl(v=""){try{const u=new URL(v,location.href);return ["http:","https:"].includes(u.protocol)?u.href:"#"}catch{return "#"}}
-
-const sd=$("#scheduleDate"); sd.value=localDate(); sd.addEventListener("change",e=>loadSchedule(e.target.value));
-setupAudio(); loadSchedule(sd.value); loadNews(); loadAds();
-setInterval(()=>{if(sd.value===localDate()&&db)loadSchedule(sd.value)},60000);
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function escapeAttr(v){return escapeHtml(v)}
+initStream(); loadSchedule(); loadNews(); loadAds();
