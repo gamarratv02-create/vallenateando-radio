@@ -37,7 +37,13 @@ const menuToggle=document.getElementById("menuToggle"), nav=document.getElementB
 menuToggle?.addEventListener("click",()=>nav.classList.toggle("open"));
 nav?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
 
-function today(){return new Date().toISOString().slice(0,10)}
+function today(){
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=String(now.getMonth()+1).padStart(2,"0");
+  const d=String(now.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+}
 const dateInput=document.getElementById("scheduleDate");
 if(dateInput){dateInput.value=today();dateInput.addEventListener("change",loadSchedule)}
 
