@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vallenateando Radio - música vallenata, radio online, programación y noticias.">
+  <title>Vallenateando Radio</title>
+  <link rel="icon" href="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="#inicio"><img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Vallenateando Radio"></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">☰</button>
+    <nav id="mainNav">
+      <a href="#inicio">Inicio</a><a href="#programacion">Programación</a><a href="#noticias">Noticias</a><a href="#publicidad">Publicidad</a><a href="#contacto">Contacto</a>
+      <a class="login-link" href="admin.html">🔐 Iniciar sesión</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="live-pill">● EN VIVO</span>
+        <h1>Vallenateando Radio</h1>
+        <p>El sonido del vallenato que te acompaña donde estés.</p>
+        <button class="primary-btn" id="heroPlay">▶ Escuchar en vivo</button>
+      </div>
+      <div class="hero-card">
+        <img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Logo Vallenateando Radio">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="programacion">
+    <div class="container">
+      <div class="section-head"><div><span class="eyebrow">RADIO</span><h2>Programación</h2></div>
+        <input type="date" id="scheduleDate">
+      </div>
+      <div id="scheduleList" class="schedule-list"><div class="empty">Cargando programación...</div></div>
+    </div>
+  </section>
+
+  <section class="section alt" id="noticias">
+    <div class="container">
+      <div class="section-head"><div><span class="eyebrow">ACTUALIDAD</span><h2>Últimas noticias</h2></div></div>
+      <div id="newsGrid" class="news-grid"><div class="empty">Cargando noticias...</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="publicidad">
+    <div class="container">
+      <div class="section-head"><div><span class="eyebrow">APOYO COMERCIAL</span><h2>Publicidad</h2></div></div>
+      <div id="adsGrid" class="ads-grid"><div class="empty">Cargando publicidad...</div></div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contacto">
+    <div class="container contact-card">
+      <div><span class="eyebrow">CONTÁCTANOS</span><h2>Vallenateando Radio</h2><p>Escúchanos, síguenos y anuncia con nosotros.</p></div>
+      <div class="socials"><a href="#" aria-label="Facebook">Facebook</a><a href="#" aria-label="Instagram">Instagram</a><a href="#" aria-label="YouTube">YouTube</a><a href="#" aria-label="TikTok">TikTok</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner"><div>© <span id="year"></span> Vallenateando Radio. Todos los derechos reservados.</div><div>Creado por <strong>Gamarra TV</strong></div></div>
+</footer>
+
+<div class="player-bar" id="playerBar">
+  <div class="player-now"><span class="mini-live">● EN VIVO</span><strong>AHORA:</strong><span id="nowProgram">Vallenateando Radio</span></div>
+  <button class="play-circle" id="playBtn" aria-label="Reproducir">▶</button>
+  <div class="player-controls"><span>🔊</span><input id="volume" type="range" min="0" max="1" step="0.01" value="1"><span>🔊</span></div>
+  <button class="more-btn" id="muteBtn" title="Silenciar">⋮</button>
+  <audio id="radioAudio" preload="none" playsinline></audio>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
