@@ -2,602 +2,128 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="description"
-    content="Vallenateando Radio - música vallenata, noticias, entretenimiento y señal en vivo."
-  >
-
-  <meta
-    name="theme-color"
-    content="#7c20c8"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vallenateando Radio - música vallenata, noticias, entretenimiento y señal en vivo.">
+  <meta name="theme-color" content="#7c20c8">
   <title>Vallenateando Radio</title>
-
-  <!-- Favicon -->
-  <link
-    rel="icon"
-    type="image/png"
-    href="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png"
-  >
-
-  <!-- Hoja de estilos -->
+  <link rel="icon" type="image/png" href="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png">
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- HLS.js para reproducir la señal .m3u8 -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-  <!-- Configuración -->
   <script src="config.js"></script>
 </head>
-
 <body>
-
-  <!-- =====================================================
-       ENCABEZADO
-  ====================================================== -->
-
-  <header class="main-header">
-
-    <div class="header-container">
-
-      <!-- LOGO -->
-      <a
-        href="index.html"
-        class="brand"
-        aria-label="Vallenateando Radio - Inicio"
-      >
-
-        <img
-          src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png"
-          alt="Vallenateando Radio"
-          class="brand-logo"
-        >
-
-      </a>
-
-
-      <!-- BOTÓN MENÚ MÓVIL -->
-
-      <button
-        id="menuToggle"
-        class="menu-toggle"
-        type="button"
-        aria-label="Abrir menú"
-      >
-        ☰
-      </button>
-
-
-      <!-- MENÚ -->
-
-      <nav
-        id="mainNav"
-        class="main-nav"
-      >
-
-        <a href="#inicio">
-          Inicio
-        </a>
-
-        <a href="#envivo">
-          En vivo
-        </a>
-
-        <a href="#programacion">
-          Programación
-        </a>
-
-        <a href="#noticias">
-          Noticias
-        </a>
-
-        <a href="#publicidad">
-          Publicidad
-        </a>
-
-        <a href="#contacto">
-          Contacto
-        </a>
-
-        <!-- INICIAR SESIÓN -->
-
-        <a
-          href="admin.html"
-          class="login-link"
-        >
-          🔐 Iniciar sesión
-        </a>
-
-      </nav>
-
-    </div>
-
-  </header>
-
-
-  <!-- =====================================================
-       CONTENIDO PRINCIPAL
-  ====================================================== -->
-
-  <main id="inicio">
-
-
-    <!-- =================================================
-         HERO
-    ================================================== -->
-
-    <section class="hero">
-
-      <div class="hero-inner">
-
-        <div class="hero-content">
-
-          <span class="eyebrow">
-            RADIO DIGITAL • 24/7
-          </span>
-
-          <h1>
-            Vallenateando Radio
-          </h1>
-
-          <p>
-            El sonido del vallenato, la información
-            y el entretenimiento, siempre contigo.
-          </p>
-
-          <a
-            href="#envivo"
-            class="hero-button"
-          >
-            ▶ Escuchar en vivo
-          </a>
-
-        </div>
-
-
-        <!-- LOGO GRANDE -->
-
-        <div class="hero-logo-wrap">
-
-          <img
-            src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png"
-            alt="Vallenateando Radio"
-          >
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         SEÑAL EN VIVO
-    ================================================== -->
-
-    <section
-      id="envivo"
-      class="live-section"
-    >
-
-      <div class="section-container live-grid">
-
-
-        <!-- INFORMACIÓN -->
-
-        <div class="live-copy">
-
-          <span class="live-badge">
-            🔴 EN VIVO
-          </span>
-
-          <h2>
-            Vallenateando Radio
-          </h2>
-
-          <p>
-            Escucha nuestra señal en vivo estés
-            donde estés.
-          </p>
-
-          <div
-            id="liveStatus"
-            class="live-status"
-          >
-            Presiona reproducir para escuchar.
-          </div>
-
-        </div>
-
-
-        <!-- PLAYER PRINCIPAL -->
-
-        <div class="live-card">
-
-          <div class="live-disc">
-            <span>
-              ♫
-            </span>
-          </div>
-
-
-          <button
-            id="mainPlayButton"
-            class="main-play-button"
-            type="button"
-            aria-label="Reproducir señal en vivo"
-          >
-            ▶
-          </button>
-
-
-          <strong>
-            Señal en vivo
-          </strong>
-
-
-          <span id="mainPlayerText">
-            Vallenateando Radio
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         PROGRAMACIÓN
-    ================================================== -->
-
-    <section
-      id="programacion"
-      class="content-section"
-    >
-
-      <div class="section-container">
-
-        <div class="section-heading">
-
-          <div>
-
-            <span class="eyebrow purple">
-              PROGRAMACIÓN
-            </span>
-
-            <h2>
-              Qué estamos transmitiendo
-            </h2>
-
-          </div>
-
-
-          <!-- FECHA -->
-
-          <input
-            type="date"
-            id="scheduleDate"
-            class="date-input"
-          >
-
-        </div>
-
-
-        <!-- PROGRAMA ACTUAL -->
-
-        <div
-          id="currentProgram"
-          class="current-program"
-        >
-          Cargando programación...
-        </div>
-
-
-        <!-- LISTA -->
-
-        <div
-          id="scheduleList"
-          class="schedule-list"
-        >
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         NOTICIAS
-    ================================================== -->
-
-    <section
-      id="noticias"
-      class="content-section alt"
-    >
-
-      <div class="section-container">
-
-        <div class="section-heading">
-
-          <div>
-
-            <span class="eyebrow purple">
-              ACTUALIDAD
-            </span>
-
-            <h2>
-              Últimas noticias
-            </h2>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="newsGrid"
-          class="news-grid"
-        >
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         PUBLICIDAD
-    ================================================== -->
-
-    <section
-      id="publicidad"
-      class="content-section"
-    >
-
-      <div class="section-container">
-
-        <div class="section-heading">
-
-          <div>
-
-            <span class="eyebrow purple">
-              PUBLICIDAD
-            </span>
-
-            <h2>
-              Espacios comerciales
-            </h2>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="adsGrid"
-          class="ads-grid"
-        >
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         CONTACTO
-    ================================================== -->
-
-    <section
-      id="contacto"
-      class="contact-section"
-    >
-
-      <div class="section-container contact-grid">
-
-
-        <div>
-
-          <span class="eyebrow">
-            CONTACTO
-          </span>
-
-          <h2>
-            Vallenateando Radio
-          </h2>
-
-          <p>
-            Comunícate con nosotros para información,
-            alianzas y publicidad.
-          </p>
-
-        </div>
-
-
-        <div class="contact-card">
-
-          <p>
-
-            <strong>
-              WhatsApp
-            </strong>
-
-            <br>
-
-            302 7820622
-
-          </p>
-
-
-          <p>
-
-            <strong>
-              Correo electrónico
-            </strong>
-
-            <br>
-
-            vallenateandoradio@gmail.com
-
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
-
-  <footer class="site-footer">
-
-    <div>
-
-      <strong>
-        Vallenateando Radio
-      </strong>
-
-      <span>
-        La radio vallenata que te acompaña.
-      </span>
-
-    </div>
-
-
-    <div>
-
-      Creado por
-      <strong>
-        Gamarra TV
-      </strong>
-
-    </div>
-
-  </footer>
-
-
-
-  <!-- =====================================================
-       REPRODUCTOR FIJO INFERIOR
-  ====================================================== -->
-
-  <div class="bottom-player">
-
-
-    <!-- INFORMACIÓN DEL PROGRAMA -->
-
-    <div class="bottom-player-info">
-
-      <img
-        src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png"
-        alt="Vallenateando Radio"
-      >
-
-
-      <div>
-
-        <small>
-          AHORA EN VIVO
-        </small>
-
-        <strong id="bottomProgram">
-          Vallenateando Radio
-        </strong>
-
-      </div>
-
-    </div>
-
-
-    <!-- BOTÓN PLAY -->
-
-    <button
-      id="playButton"
-      class="player-play"
-      type="button"
-      aria-label="Reproducir o pausar"
-    >
-      ▶
-    </button>
-
-
-    <!-- VOLUMEN -->
-
-    <div class="volume-container">
-
-      <span>
-        🔊
-      </span>
-
-      <input
-        id="volumeControl"
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        value="0.8"
-        aria-label="Volumen"
-      >
-
-    </div>
-
-
-    <!-- OPCIONES -->
-
-    <button
-      id="playerOptions"
-      class="player-options"
-      type="button"
-      aria-label="Opciones del reproductor"
-    >
-      ⋮
-    </button>
-
+<header class="main-header">
+  <div class="header-container">
+    <a href="#inicio" class="brand" aria-label="Vallenateando Radio - Inicio">
+      <img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Vallenateando Radio" class="brand-logo">
+    </a>
+    <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
+    <nav id="mainNav" class="main-nav">
+      <a href="#inicio">Inicio</a>
+      <a href="#envivo">En vivo</a>
+      <a href="#programacion">Programación</a>
+      <a href="#noticias">Noticias</a>
+      <a href="#publicidad">Publicidad</a>
+      <a href="#contacto">Contacto</a>
+      <a href="admin.html" class="login-link">🔐 Iniciar sesión</a>
+    </nav>
   </div>
+</header>
 
+<main id="inicio">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="eyebrow">RADIO DIGITAL • 24/7</span>
+        <h1>Vallenateando Radio</h1>
+        <p>El sonido del vallenato, la información y el entretenimiento, siempre contigo.</p>
+        <a href="#envivo" class="hero-button">▶ Escuchar en vivo</a>
+      </div>
+      <div class="hero-logo-wrap">
+        <img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Vallenateando Radio">
+      </div>
+    </div>
+  </section>
 
+  <section id="envivo" class="live-section">
+    <div class="section-container live-grid">
+      <div class="live-copy">
+        <span class="live-badge">🔴 EN VIVO</span>
+        <h2>Vallenateando Radio</h2>
+        <p>Escucha nuestra señal en vivo estés donde estés.</p>
+        <div id="liveStatus" class="live-status">Presiona reproducir para escuchar.</div>
+      </div>
+      <div class="live-card">
+        <div class="live-disc"><img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt=""></div>
+        <button id="mainPlayButton" class="main-play-button" type="button">▶</button>
+        <strong>Señal en vivo</strong>
+        <span id="mainPlayerText">Vallenateando Radio</span>
+      </div>
+    </div>
+  </section>
 
-  <!-- =====================================================
-       AUDIO
-  ====================================================== -->
+  <section id="programacion" class="content-section">
+    <div class="section-container">
+      <div class="section-heading">
+        <div><span class="eyebrow purple">PROGRAMACIÓN</span><h2>Qué estamos transmitiendo</h2></div>
+        <input type="date" id="scheduleDate" class="date-input">
+      </div>
+      <div id="currentProgram" class="current-program">Cargando programación...</div>
+      <div id="scheduleList" class="schedule-list"></div>
+    </div>
+  </section>
 
-  <audio
-    id="radioAudio"
-    preload="none"
-    playsinline
-  ></audio>
+  <section id="noticias" class="content-section alt">
+    <div class="section-container">
+      <div class="section-heading">
+        <div><span class="eyebrow purple">ACTUALIDAD</span><h2>Últimas noticias</h2></div>
+      </div>
+      <div id="newsGrid" class="news-grid"></div>
+    </div>
+  </section>
 
+  <section id="publicidad" class="content-section">
+    <div class="section-container">
+      <div class="section-heading">
+        <div><span class="eyebrow purple">PUBLICIDAD</span><h2>Espacios comerciales</h2></div>
+      </div>
+      <div id="adsGrid" class="ads-grid"></div>
+    </div>
+  </section>
 
+  <section id="contacto" class="contact-section">
+    <div class="section-container contact-grid">
+      <div>
+        <span class="eyebrow">CONTACTO</span>
+        <h2>Vallenateando Radio</h2>
+        <p>Comunícate con nosotros para información, alianzas y publicidad.</p>
+      </div>
+      <div class="contact-card">
+        <p><strong>WhatsApp</strong><br>302 7820622</p>
+        <p><strong>Correo electrónico</strong><br>vallenateandoradio@gmail.com</p>
+      </div>
+    </div>
+  </section>
+</main>
 
-  <!-- =====================================================
-       SCRIPTS
-  ====================================================== -->
+<footer class="site-footer">
+  <div><strong>Vallenateando Radio</strong><span>La radio vallenata que te acompaña.</span></div>
+  <div>Creado por <strong>Gamarra TV</strong></div>
+</footer>
 
-  <script src="supabase.js"></script>
+<div class="bottom-player">
+  <div class="bottom-player-info">
+    <img src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Vallenateando Radio">
+    <div><small>AHORA EN VIVO</small><strong id="bottomProgram">Vallenateando Radio</strong></div>
+  </div>
+  <button id="playButton" class="player-play" type="button" aria-label="Reproducir o pausar">▶</button>
+  <div class="volume-container"><span>🔊</span><input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8"></div>
+  <button id="playerOptions" class="player-options" type="button" aria-label="Opciones">⋮</button>
+</div>
 
-  <script src="app.js"></script>
-
+<audio id="radioAudio" preload="none" playsinline></audio>
+<script src="supabase.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
