@@ -3,5 +3,5 @@
 // IMPORTANTE: usa solamente la ANON/PUBLISHABLE KEY en el navegador.
 // Nunca pongas aquí una service_role/secret key.
 
-const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
-const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://qfyrjqrcubljvdjvybss.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_6ytGRv66Ybi6egDTVIiyKA_lGOtz-Nj";
