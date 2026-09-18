@@ -1,1 +1,45 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="theme-color" content="#7c20c8"><title>En vivo | Vallenateando Radio</title><link rel="icon" href="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg"><link rel="stylesheet" href="styles.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><script src="config.js"></script></head><body><header class="main-header"><div class="header-container"><a href="index.html" class="brand"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" class="brand-logo" alt="Vallenateando Radio"></a><button id="menuToggle" class="menu-toggle" type="button">☰</button><nav id="mainNav" class="main-nav"><a href="index.html">Inicio</a><a href="en-vivo.html" class="nav-live">▶ Escuchar en vivo</a><a href="programacion.html">Programación</a><a href="noticias.html">Noticias</a><a href="publicidad.html">Publicidad</a><a href="contacto.html">Contacto</a><a href="admin.html" class="login-link">🔐 Iniciar sesión</a></nav></div></header><main><section class="live-section page-top"><div class="section-container live-grid"><div class="live-copy"><span class="live-badge">🔴 EN VIVO</span><h2>Vallenateando Radio en vivo</h2><p>Activa la emisora y disfruta nuestra señal de audio 24/7.</p><div id="liveStatus" class="live-status">Presiona reproducir para escuchar.</div></div><div class="live-card"><div class="live-disc"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt=""></div><button id="mainPlayButton" class="main-play-button" type="button">▶</button><strong>Señal en vivo</strong><span id="mainPlayerText">Vallenateando Radio</span></div></div></section></main><footer class="site-footer"><div><strong>Vallenateando Radio</strong><span>La radio vallenata que te acompaña.</span></div><div>Creado por <strong>Gamarra TV</strong></div></footer><div class="bottom-player"><div class="bottom-player-info"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio"><div><small>AHORA EN VIVO</small><strong id="bottomProgram">Vallenateando Radio</strong></div></div><button id="playButton" class="player-play" type="button">▶</button><div class="volume-container"><span>🔊</span><input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8"></div><button class="player-options" type="button" onclick="location.href='en-vivo.html'">⋮</button></div><audio id="radioAudio" preload="none" playsinline></audio><script src="supabase.js"></script><script src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#071b2b">
+<title>Escuchar en vivo | Vallenateando Radio</title>
+<link rel="icon" href="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<header class="top-header">
+<div class="topline"><div>Vallenateando Radio · Emisora online</div><div class="social-links"><span>Facebook</span><span>YouTube</span><span>Instagram</span><span>TikTok</span></div></div>
+<div class="head-main">
+<a href="index.html" class="brand"><img class="brand-logo" src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio"></a>
+<button id="menuToggle" class="menu-toggle" type="button">☰</button>
+<nav id="mainNav" class="main-nav"><a href="index.html">Inicio</a><a href="en-vivo.html" class="active nav-live">🔴 En vivo</a><a href="programacion.html">Programación</a><a href="noticias.html">Noticias</a><a href="publicidad.html">Publicidad</a><a href="contacto.html">Contacto</a><a href="admin.html" class="login-link">Iniciar sesión</a></nav>
+</div>
+<div class="ticker"><span>EN VIVO</span><div>Vallenateando Radio transmite online.</div></div>
+</header>
+<main class="page-wrap">
+<section class="live-page-card">
+<div class="live-page-copy">
+<span class="eyebrow">VALLENATEANDO RADIO</span>
+<div class="live-badge">🔴 EN VIVO</div>
+<h1>Escucha nuestra señal en vivo</h1>
+<p>Disfruta Vallenateando Radio desde cualquier dispositivo. Pulsa reproducir para activar el audio.</p>
+<button id="mainPlayButton" class="primary-play big" type="button">▶ Reproducir señal</button>
+<div id="liveStatus" class="live-status">Señal lista para reproducir.</div>
+</div>
+<div class="live-station">
+<div class="radio-disc large"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio"></div>
+<h2 id="heroProgram">Vallenateando Radio</h2>
+<p id="heroProgramDesc">Señal de audio online</p>
+<div class="sound-waves"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+</section>
+</main>
+<footer class="site-footer"><div><strong>Vallenateando Radio</strong><span>Emisora online · Música, noticias y actualidad.</span></div><div>Creado por <strong>Gamarra TV</strong></div></footer>
+<div class="bottom-player"><div class="bottom-player-info"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt=""><div><small>AHORA EN VIVO</small><strong id="bottomProgram">Vallenateando Radio</strong></div></div><button id="playButton" class="player-play" type="button">▶</button><div class="volume-container"><span>🔊</span><input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8"></div><button class="player-options" type="button">⋮</button></div>
+<audio id="radioAudio" preload="none" playsinline></audio>
+<script src="supabase.js"></script><script src="app.js"></script>
+</body></html>
