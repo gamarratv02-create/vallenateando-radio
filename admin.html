@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Administración | Vallenateando Radio</title>
-<link rel="icon" href="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png">
+<link rel="icon" href="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg">
 <link rel="stylesheet" href="styles.css">
 <style>
 .admin-page{background:#f7f4fa;min-height:100vh;padding:40px 0 90px}.admin-box{background:#fff;border:1px solid #e9e2ef;border-radius:22px;padding:28px;box-shadow:0 15px 40px rgba(50,25,70,.08);margin-bottom:22px}.admin-box h1,.admin-box h2{margin-bottom:10px}.admin-box>p{color:#77717e}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.form-grid .full{grid-column:1/-1}.admin-box input,.admin-box textarea,.admin-box select{width:100%;padding:12px;border:1px solid #ddd3e4;border-radius:11px;background:#fff}.admin-box textarea{min-height:120px;resize:vertical}.admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.admin-btn{border:0;border-radius:999px;padding:12px 18px;background:#7c20c8;color:#fff;font-weight:800;cursor:pointer}.admin-btn.secondary{background:#eee7f2;color:#54216d}.admin-btn.danger{background:#fee7ef;color:#a3214b}.admin-list{display:grid;gap:10px;margin-top:20px}.admin-row{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:15px;border:1px solid #e9e2ef;border-radius:14px}.admin-news-row{display:grid;grid-template-columns:100px 1fr auto;gap:15px;align-items:center}.admin-news-row img{width:100px;height:75px;object-fit:cover;border-radius:10px;background:#eee}.file-help{font-size:12px;color:#77717e;margin-top:6px}.form-title{display:flex;justify-content:space-between;align-items:center;gap:15px}.hidden{display:none}.message{margin-top:12px;font-weight:700}.preview{max-width:180px;max-height:110px;border-radius:12px;display:none;margin-top:8px}@media(max-width:700px){.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.admin-row,.admin-news-row{align-items:flex-start;flex-direction:column}.admin-news-row{display:flex}.admin-news-row img{width:100%;height:170px}.admin-actions .admin-btn{width:100%}}
@@ -12,11 +12,12 @@
 <script src="config.js"></script>
 </head>
 <body>
-<header class="main-header"><div class="header-container"><a href="index.html" class="brand"><img class="brand-logo" src="https://i.ibb.co/fd1KBpkp/IMG-20260917-WA0016-removebg-preview.png" alt="Vallenateando Radio"></a><a class="login-link" href="index.html">← Volver al sitio</a></div></header>
+<header class="main-header"><div class="header-container"><a href="index.html" class="brand"><img class="brand-logo" src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio"></a><a class="login-link" href="index.html">← Volver al sitio</a></div></header>
 <main class="admin-page"><div class="section-container">
 <div id="loginBox" class="admin-box">
 <h1>Panel administrativo</h1><p>Inicia sesión para administrar Vallenateando Radio.</p>
 <form id="loginForm" class="form-grid" style="margin-top:18px"><input id="email" type="email" placeholder="Correo" required><input id="password" type="password" placeholder="Contraseña" required><div class="full admin-actions"><button class="admin-btn" type="submit">Iniciar sesión</button></div></form><p id="loginMsg" class="message"></p>
+<p class="file-help">El acceso usa el usuario creado en Supabase → Authentication → Users. No es el mismo correo de GitHub/Vercel.</p>
 </div>
 <div id="panel" class="hidden">
 <div class="admin-box"><div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap"><div><h1>Administración</h1><p>Publica y administra el contenido de Vallenateando Radio.</p></div><button id="logout" class="admin-btn secondary">Cerrar sesión</button></div></div>

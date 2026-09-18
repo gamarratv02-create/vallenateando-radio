@@ -68,3 +68,8 @@ create policy "media_auth_update" on storage.objects for update to authenticated
 
 drop policy if exists "media_auth_delete" on storage.objects;
 create policy "media_auth_delete" on storage.objects for delete to authenticated using (bucket_id='media');
+
+
+-- Opcional: slug permanente para enlaces amigables. El sitio también funciona sin esta columna.
+alter table public.noticias add column if not exists slug text;
+create index if not exists noticias_slug_idx on public.noticias(slug);

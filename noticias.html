@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="description" content="Vallenateando Radio: noticias, música vallenata, entretenimiento y señal en vivo.">
+<meta name="description" content="Noticias de Vallenateando Radio.">
 <meta name="theme-color" content="#061b2b">
-<title>Vallenateando Radio | Noticias, música y actualidad</title>
+<title>Noticias | Vallenateando Radio</title>
 <link rel="icon" href="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,32 +25,17 @@
  <div class="ticker"><span>ÚLTIMA HORA</span><div id="tickerText">Vallenateando Radio, música, noticias y actualidad.</div></div>
 </header>
 
-<main id="homeContent" class="home-main">
-<section class="home-title">
- <span>VALLENATEANDO RADIO</span><h1>Noticias, música y actualidad</h1>
- <p>Información y entretenimiento para el sur del Cesar y el Magdalena Medio.</p>
-</section>
-
-<section class="featured-wrap">
- <div id="featuredNews" class="featured-news"><div class="empty-state">Cargando noticias...</div></div>
-</section>
-
-<section class="latest-section">
- <div class="section-bar"><div><span>VALLENATEANDO RADIO</span><h2>Últimas noticias</h2><p>Las noticias más recientes.</p></div><a href="noticias.html">Ver todas →</a></div>
- <div id="latestNews" class="latest-grid"></div>
-</section>
-
-<section class="category-section">
- <div class="section-bar"><div><span>ACTUALIDAD</span><h2>Noticias destacadas</h2></div><a href="noticias.html">Ver todas →</a></div>
- <div id="categoryNews" class="news-grid"></div>
-</section>
-
-<section class="radio-home">
- <div><span>VALLENATEANDO RADIO</span><h2>Escucha nuestra señal en vivo</h2><p>Música vallenata y programación durante todo el día.</p><a href="en-vivo.html" class="cyan-btn">▶ Escuchar en vivo</a></div>
- <img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio">
-</section>
+<main class="news-page">
+ <section class="news-banner"><span>VALLENATEANDO RADIO</span><h1>Noticias</h1><p>Encuentra las noticias más recientes de Vallenateando Radio.</p></section>
+ <div class="news-tools">
+  <div class="search-box">⌕ <input id="newsSearch" placeholder="Buscar noticias, temas o palabras clave..."></div>
+  <select id="newsCategory"><option value="">Todas las categorías</option><option>Gamarra</option><option>Seguridad</option><option>Judicial</option><option>Política</option><option>Educación</option><option>Salud</option><option>Economía</option><option>Deportes</option><option>Región</option><option>Nacionales</option><option>Internacionales</option><option>Entretenimiento</option></select>
+ </div>
+ <div id="newsCategories" class="category-pills">
+  <button class="active" data-cat="">Todas</button><button data-cat="Gamarra">Gamarra</button><button data-cat="Seguridad">Seguridad</button><button data-cat="Judicial">Judicial</button><button data-cat="Política">Política</button><button data-cat="Educación">Educación</button><button data-cat="Salud">Salud</button><button data-cat="Economía">Economía</button><button data-cat="Deportes">Deportes</button><button data-cat="Región">Región</button><button data-cat="Nacionales">Nacionales</button><button data-cat="Internacionales">Internacionales</button><button data-cat="Entretenimiento">Entretenimiento</button>
+ </div>
+ <div id="allNewsGrid" class="news-grid news-page-grid"><div class="empty-state">Cargando noticias...</div></div>
 </main>
-<section id="articleRoute" class="article-page route-hidden"><div id="article"></div></section>
 <footer class="site-footer"><div><strong>Vallenateando Radio</strong><span>La radio vallenata que te acompaña.</span></div><div>Creado por <strong>Gamarra TV</strong></div></footer>
 <div class="bottom-player">
  <div class="bottom-player-info"><img src="https://i.ibb.co/PZ0HGV8f/679447344-122207733584050358-5105386293512261086-n.jpg" alt="Vallenateando Radio"><div><small>AHORA EN VIVO</small><strong id="bottomProgram">Vallenateando Radio</strong></div></div>

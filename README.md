@@ -22,3 +22,9 @@ La clave incluida en `config.js` es una clave publicable de Supabase. Nunca reem
 
 ## Noticias desde el administrador
 El panel permite crear, editar y eliminar noticias. La imagen puede subirse directamente desde el computador al bucket público `media` de Supabase.
+
+## Páginas
+El menú está separado en páginas independientes: Inicio, En vivo, Programación, Noticias, Publicidad y Contacto. El botón "Escuchar en vivo" de Inicio activa la emisora con un clic. En las demás páginas el reproductor inferior permite activarla.
+
+## Enlaces individuales de noticias
+Cada noticia publicada abre en `noticia.html?id=ID`, por lo que cada noticia tiene su propio enlace para compartir.

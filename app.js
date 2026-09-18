@@ -1,83 +1,84 @@
-const audio = document.getElementById("radioAudio");
-const playButtons = [document.getElementById("playButton"), document.getElementById("mainPlayButton")];
-const statusEl = document.getElementById("liveStatus");
-const volume = document.getElementById("volumeControl");
-let hls = null;
 
-function setButtons(playing){
-  playButtons.forEach(b => { if(b) b.textContent = playing ? "❚❚" : "▶"; });
-  if(statusEl) statusEl.textContent = playing ? "🔴 Señal en vivo reproduciéndose." : "Presiona reproducir para escuchar.";
-}
-function initStream(){
-  if(audio.canPlayType("application/vnd.apple.mpegurl")){
-    audio.src = STREAM_URL;
-  } else if(window.Hls && Hls.isSupported()){
-    hls = new Hls({enableWorker:true});
-    hls.loadSource(STREAM_URL);
-    hls.attachMedia(audio);
-    hls.on(Hls.Events.ERROR,(_,data)=>{
-      if(data.fatal && statusEl) statusEl.textContent="No fue posible cargar la señal. Intenta nuevamente.";
-    });
-  } else audio.src = STREAM_URL;
-}
-async function toggleAudio(){
-  try{
-    if(audio.paused){ await audio.play(); setButtons(true); }
-    else { audio.pause(); setButtons(false); }
-  }catch(e){
-    if(statusEl) statusEl.textContent="El navegador bloqueó la reproducción. Presiona nuevamente.";
-  }
-}
-playButtons.forEach(b=>b&&b.addEventListener("click",toggleAudio));
-audio.addEventListener("play",()=>setButtons(true));
-audio.addEventListener("pause",()=>setButtons(false));
-if(volume){ volume.addEventListener("input",()=>audio.volume=Number(volume.value)); audio.volume=.8; }
+const audio=document.getElementById("radioAudio");
+const playButton=document.getElementById("playButton");
+const volume=document.getElementById("volumeControl");
+let hls=null;
 
-const menuToggle=document.getElementById("menuToggle"), nav=document.getElementById("mainNav");
-menuToggle?.addEventListener("click",()=>nav.classList.toggle("open"));
-nav?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
-
-function today(){
-  const now=new Date();
-  const y=now.getFullYear();
-  const m=String(now.getMonth()+1).padStart(2,"0");
-  const d=String(now.getDate()).padStart(2,"0");
-  return `${y}-${m}-${d}`;
-}
-const dateInput=document.getElementById("scheduleDate");
-if(dateInput){dateInput.value=today();dateInput.addEventListener("change",loadSchedule)}
-
-async function loadSchedule(){
-  const list=document.getElementById("scheduleList"), current=document.getElementById("currentProgram");
-  if(!list)return;
-  list.innerHTML="<div class='empty-state'>Cargando programación...</div>";
-  const date=dateInput?.value||today();
-  const {data,error}=await supabaseClient.from("programacion").select("*").eq("fecha",date).order("hora_inicio");
-  if(error){list.innerHTML="<div class='empty-state'>No se pudo cargar la programación.</div>";return}
-  if(!data?.length){current.textContent="No hay programación publicada para esta fecha.";list.innerHTML="<div class='empty-state'>Agrega programas desde el panel administrativo.</div>";return}
-  const now=new Date();
-  let active=null;
-  list.innerHTML=data.map(p=>{
-    const s=`${p.fecha}T${p.hora_inicio}`, e=`${p.fecha}T${p.hora_fin}`;
-    if(date===today() && now>=new Date(s) && now<=new Date(e)) active=p;
-    return `<article class="schedule-item"><div class="schedule-time">${p.hora_inicio} – ${p.hora_fin}</div><div><strong>${escapeHtml(p.titulo||"Programa")}</strong><div class="schedule-desc">${escapeHtml(p.descripcion||"")}</div></div></article>`;
-  }).join("");
-  current.textContent=active?`AHORA: ${active.titulo}`:"Programación del día";
-  const bottom=document.getElementById("bottomProgram"), main=document.getElementById("mainPlayerText");
-  if(active){if(bottom)bottom.textContent=active.titulo;if(main)main.textContent=active.titulo;}
-}
-async function loadNews(){
-  const grid=document.getElementById("newsGrid"); if(!grid)return;
-  const {data,error}=await supabaseClient.from("noticias").select("*").order("created_at",{ascending:false}).limit(9);
-  if(error||!data?.length){grid.innerHTML="<div class='empty-state'>Aún no hay noticias publicadas.</div>";return}
-  grid.innerHTML=data.map(n=>`<article class="news-card">${n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:""}<div class="news-card-body"><span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span><h3>${escapeHtml(n.titulo||"Sin título")}</h3><p>${escapeHtml((n.resumen||n.contenido||"").slice(0,180))}</p></div></article>`).join("");
-}
-async function loadAds(){
-  const grid=document.getElementById("adsGrid"); if(!grid)return;
-  const {data,error}=await supabaseClient.from("publicidad").select("*").order("created_at",{ascending:false}).limit(8);
-  if(error||!data?.length){grid.innerHTML="<div class='empty-state'>Aún no hay espacios publicitarios publicados.</div>";return}
-  grid.innerHTML=data.map(a=>`<article class="ad-card">${a.imagen_url?`<img src="${escapeAttr(a.imagen_url)}" alt="">`:""}<div class="ad-body"><strong>${escapeHtml(a.titulo||"Publicidad")}</strong><p>${escapeHtml(a.descripcion||"")}</p></div></article>`).join("");
-}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function escapeAttr(v){return escapeHtml(v)}
-initStream(); loadSchedule(); loadNews(); loadAds();
+function slugify(v){return String(v||"noticia").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,120)}
+function newsUrl(n){return `index.html#/noticia/${encodeURIComponent(n.slug||slugify(n.titulo))}`}
+
+function setPlaying(p){if(playButton)playButton.textContent=p?"❚❚":"▶"}
+function initStream(){
+ if(!audio)return;
+ if(audio.canPlayType("application/vnd.apple.mpegurl")) audio.src=STREAM_URL;
+ else if(window.Hls&&Hls.isSupported()){hls=new Hls();hls.loadSource(STREAM_URL);hls.attachMedia(audio)}
+ else audio.src=STREAM_URL;
+}
+async function toggleAudio(){if(!audio)return;try{if(audio.paused)await audio.play();else audio.pause()}catch(e){}}
+playButton?.addEventListener("click",toggleAudio);
+audio?.addEventListener("play",()=>setPlaying(true));audio?.addEventListener("pause",()=>setPlaying(false));
+if(volume){volume.addEventListener("input",()=>audio.volume=Number(volume.value));audio.volume=.8}
+document.getElementById("menuToggle")?.addEventListener("click",()=>document.getElementById("mainNav")?.classList.toggle("open"));
+
+function renderCard(n,small=false){
+ const img=n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:"";
+ return `<article class="news-card ${small?"small":""}">
+  <a href="${newsUrl(n)}">${img}<div class="news-card-body">
+   <span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span>
+   <h3>${escapeHtml(n.titulo||"Sin título")}</h3>
+   <p>${escapeHtml((n.resumen||n.contenido||"").slice(0,155))}</p>
+   <div class="card-meta"><span>${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):""}</span><b>LEER NOTICIA</b><i>→</i></div>
+  </div></a></article>`
+}
+async function getNews(limit=30){
+ const {data,error}=await supabaseClient.from("noticias").select("*").order("created_at",{ascending:false}).limit(limit);
+ return error?[]:(data||[]);
+}
+async function loadHome(){
+ const featured=document.getElementById("featuredNews");if(!featured)return;
+ const news=await getNews(12);
+ if(!news.length){featured.innerHTML="<div class='empty-state'>Aún no hay noticias publicadas.</div>";return}
+ const [a,b,c]=news;
+ featured.innerHTML=`<div class="featured-main"><a href="${newsUrl(a)}">${a.imagen_url?`<img src="${escapeAttr(a.imagen_url)}" alt="">`:""}<div class="featured-overlay"><span class="news-tag">${escapeHtml(a.categoria||"Actualidad")}</span><h2>${escapeHtml(a.titulo)}</h2><p>${escapeHtml(a.resumen||"")}</p></div></a></div>
+ <div class="featured-side">${[b,c].filter(Boolean).map(n=>`<article><a href="${newsUrl(n)}">${n.imagen_url?`<img src="${escapeAttr(n.imagen_url)}" alt="">`:""}<div><span class="news-tag">${escapeHtml(n.categoria||"Actualidad")}</span><h3>${escapeHtml(n.titulo)}</h3><small>${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"short",year:"numeric"}):""}</small></div></a></article>`).join("")}</div>`;
+ document.getElementById("latestNews").innerHTML=news.slice(0,5).map(n=>renderCard(n,true)).join("");
+ document.getElementById("categoryNews").innerHTML=news.slice(3,9).map(n=>renderCard(n)).join("");
+ const ticker=document.getElementById("tickerText");if(ticker)ticker.textContent=a.titulo;
+}
+let allNews=[];
+function renderAllNews(){
+ const grid=document.getElementById("allNewsGrid");if(!grid)return;
+ const q=(document.getElementById("newsSearch")?.value||"").toLowerCase().trim();
+ const cat=document.getElementById("newsCategory")?.value||"";
+ const filtered=allNews.filter(n=>(!cat||n.categoria===cat)&&(!q||`${n.titulo} ${n.resumen} ${n.contenido} ${n.categoria}`.toLowerCase().includes(q)));
+ grid.innerHTML=filtered.length?filtered.map(n=>renderCard(n)).join(""):"<div class='empty-state'>No encontramos noticias con esos filtros.</div>";
+}
+async function loadNewsPage(){
+ if(!document.getElementById("allNewsGrid"))return;
+ allNews=await getNews(100);renderAllNews();
+ document.getElementById("newsSearch")?.addEventListener("input",renderAllNews);
+ document.getElementById("newsCategory")?.addEventListener("change",renderAllNews);
+ document.querySelectorAll(".category-pills button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".category-pills button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById("newsCategory").value=b.dataset.cat;renderAllNews()}));
+}
+async function renderArticleFromHash(){
+ const article=document.getElementById("article"), route=document.getElementById("articleRoute"), home=document.getElementById("homeContent");
+ if(!article||!route)return;
+ const match=decodeURIComponent(location.hash).match(/^#\/noticia\/(.+)$/);
+ if(!match){route.classList.add("route-hidden");if(home)home.style.display="block";return}
+ route.classList.remove("route-hidden");if(home)home.style.display="none";
+ const slug=match[1];
+ const news=await getNews(100);
+ const n=news.find(x=>(x.slug||slugify(x.titulo))===slug);
+ if(!n){article.innerHTML="<div class='empty-state'>No se encontró esta noticia.</div>";return}
+ document.title=`${n.titulo} | Vallenateando Radio`;
+ article.innerHTML=`<div class="article-kicker">${escapeHtml(n.categoria||"Actualidad")}</div>
+ <h1>${escapeHtml(n.titulo)}</h1><div class="article-date">${n.created_at?new Date(n.created_at).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"}):""}</div>
+ ${n.imagen_url?`<img class="article-image" src="${escapeAttr(n.imagen_url)}" alt="">`:""}
+ ${n.resumen?`<p class="article-lead">${escapeHtml(n.resumen)}</p>`:""}
+ <div class="article-body">${escapeHtml(n.contenido||"").replace(/\n/g,"<br>")}</div>
+ ${n.video_url?`<div class="article-video"><a href="${escapeAttr(n.video_url)}" target="_blank" rel="noopener">▶ Ver video</a></div>`:""}
+ <a class="back-news" href="noticias.html">← Volver a noticias</a>`;
+}
+initStream();loadHome();loadNewsPage();renderArticleFromHash();window.addEventListener("hashchange",renderArticleFromHash);
