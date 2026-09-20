@@ -1,17 +1,21 @@
 # Vallenateando Radio
 
-Sitio web estático para Vallenateando Radio, preparado para GitHub + Vercel.
+## Publicación de noticias
+Esta versión usa Supabase Auth + RLS. Solo un usuario autenticado puede crear, editar o eliminar noticias.
 
-## Archivos
-- `index.html`: estructura del sitio.
-- `styles.css`: diseño responsive.
-- `app.js`: navegación, reproductor, noticias, programación y login.
-- `config.js`: señal, logo, Supabase y contacto.
-- `setup.sql`: tablas y políticas de Supabase.
-- `.env.example`: referencia de variables si después migras a un build con variables de entorno.
+### 1. Ejecutar Supabase
+En **Supabase > SQL Editor** pega y ejecuta todo `setup.sql`.
 
-## Publicar
-Sube todos los archivos a la raíz del repositorio de GitHub y conecta el repositorio a Vercel.
+### 2. Crear el administrador
+Ve a **Authentication > Users > Add user** y crea el correo y contraseña que usarás en la web.
 
-## Supabase
-Ejecuta `setup.sql` en SQL Editor. Luego crea el usuario administrador en Authentication > Users. No pongas una `service_role` key en el frontend.
+Si el proyecto exige confirmación de correo, confirma el usuario antes de iniciar sesión.
+
+### 3. Configuración
+`config.js` contiene la URL y la clave pública (`sb_publishable_...`). Esa clave se puede usar en el navegador. **Nunca uses una service_role key en este archivo.**
+
+### 4. GitHub + Vercel
+Sube todos los archivos a la raíz del repositorio y conecta el repositorio con Vercel.
+
+### Si no permite publicar
+Entra a **Iniciar sesión**, accede con el usuario creado en Supabase y luego pulsa **+ Nueva noticia**. Si falla, la versión nueva muestra el mensaje exacto devuelto por Supabase.
