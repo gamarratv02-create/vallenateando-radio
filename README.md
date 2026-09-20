@@ -19,3 +19,8 @@ Sube todos los archivos a la raíz del repositorio y conecta el repositorio con 
 
 ### Si no permite publicar
 Entra a **Iniciar sesión**, accede con el usuario creado en Supabase y luego pulsa **+ Nueva noticia**. Si falla, la versión nueva muestra el mensaje exacto devuelto por Supabase.
+
+
+## Vallenateando Radio — versión profesional
+
+Rediseño orientado a emisora online: identidad visual consistente, portada editorial, noticias destacadas, programación del día, contacto comercial y reproductor inferior persistente. El audio usa la señal HLS configurada en `config.js`.

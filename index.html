@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#111827" />
-  <meta name="description" content="Vallenateando Radio — emisora online con música, noticias y programación." />
+  <meta name="description" content="Vallenateando Radio — emisora online de vallenato, música, noticias y programación." />
+  <meta name="theme-color" content="#081522" />
+  <meta property="og:title" content="Vallenateando Radio | Emisora Online" />
+  <meta property="og:description" content="Escucha Vallenateando Radio en vivo y consulta noticias y programación." />
   <title>Vallenateando Radio | En vivo</title>
   <link rel="icon" href="https://i.ibb.co/gbPm5z4x/deccdb0d-eda4-423b-a55d-121bc13099f0-removebg-preview.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +16,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="topbar"><div class="container topbar-inner"><span>Vallenateando Radio</span><div class="socials"><a href="#contacto">Contacto</a><a href="#programacion">Programación</a><a href="#noticias">Noticias</a></div></div></div>
+  <div class="topbar"><div class="container topbar-inner"><span class="topbar-live"><span class="top-live-dot"></span> VALLENATEANDO RADIO · EMISORA ONLINE 24/7</span><div class="socials"><a href="#contacto">Contacto</a><a href="#programacion">Programación</a><a href="#noticias">Noticias</a></div></div></div>
 
   <header class="site-header">
     <div class="container nav-wrap">
@@ -32,7 +35,7 @@
 
   <footer class="footer"><div class="container footer-grid"><div><div class="footer-brand">Vallenateando Radio</div><p>La emisora online con lo mejor del vallenato, música, información y compañía.</p></div><div><h4>Enlaces</h4><a href="#en-vivo">Escuchar en vivo</a><a href="#programacion">Programación</a><a href="#noticias">Noticias</a></div><div><h4>Contacto</h4><p>📱 +57 301 3799517</p><p>✉️ juniorcamargoproducciones@gmail.com</p></div></div><div class="footer-bottom">© <span id="year"></span> Vallenateando Radio · Creado por <strong>Gamarra TV</strong></div></footer>
 
-  <div class="player" id="player"><div class="player-inner container"><div class="now"><div class="mini-logo"><img src="https://i.ibb.co/gbPm5z4x/deccdb0d-eda4-423b-a55d-121bc13099f0-removebg-preview.png" alt="" /></div><div><span class="live-dot"></span><small>AHORA EN VIVO</small><strong>Vallenateando Radio</strong></div></div><button class="play" id="playBtn" aria-label="Reproducir">▶</button><div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="volume"><span>🔊</span><input id="volume" type="range" min="0" max="1" step="0.01" value="0.85" /></div><button class="expand" id="expandPlayer" aria-label="Ampliar reproductor" title="Ampliar reproductor">⌃</button></div></div>
+  <div class="player" id="player"><div class="player-inner container"><div class="now"><div class="mini-logo"><img src="https://i.ibb.co/gbPm5z4x/deccdb0d-eda4-423b-a55d-121bc13099f0-removebg-preview.png" alt="Vallenateando Radio" /></div><div class="now-copy"><div class="live-line"><span class="live-dot"></span><small>AHORA EN VIVO</small></div><strong>Vallenateando Radio</strong><span class="player-program" id="playerProgram">Señal en directo · 24/7</span></div></div><button class="play" id="playBtn" aria-label="Reproducir">▶</button><div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="volume"><span>🔊</span><input id="volume" type="range" min="0" max="1" step="0.01" value="0.85" /></div><button class="expand" id="expandPlayer" aria-label="Ampliar reproductor" title="Ampliar reproductor">⌃</button></div></div>
   <audio id="audio" preload="none" crossorigin="anonymous"></audio>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
   <script src="config.js"></script><script type="module" src="app.js"></script>
