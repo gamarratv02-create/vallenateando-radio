@@ -399,3 +399,107 @@ nav .admin-link:hover{background:#102a40!important;color:#fff!important}
 @media(max-width:900px){.hero-grid,.news-showcase{grid-template-columns:1fr}.hero-art{min-height:340px}.quick-grid{grid-template-columns:repeat(2,1fr)}.quick-grid>a:nth-child(2){border-right:0}.secondary-news{grid-template-rows:none;grid-template-columns:1fr 1fr}.secondary-card{grid-template-columns:90px 1fr}.premium-contact{grid-template-columns:1fr}.player-program{max-width:190px}}
 @media(max-width:680px){.topbar-live{font-size:8px}.socials{display:none}.nav-wrap{min-height:72px}.brand-copy{display:none}.logo-box{width:58px;height:54px}.logo-box img{width:54px;height:52px}.hero{padding:34px 0}.hero h1{font-size:50px;letter-spacing:-2px}.hero-art{min-height:300px}.quick-grid{grid-template-columns:1fr 1fr}.quick-grid>a{padding:14px 10px}.quick-grid b{font-size:10px}.quick-grid small{font-size:8px}.section{padding:34px 0}.section-head{align-items:flex-start;flex-direction:column}.section-head h2{font-size:25px}.premium-live{padding:24px}.live-card{grid-template-columns:1fr;text-align:left}.big-play{margin:10px auto 0}.featured-news{min-height:390px}.featured-content h3{font-size:24px}.secondary-news{grid-template-columns:1fr}.secondary-card{grid-template-columns:105px 1fr}.page-title{font-size:36px!important}.article-modern{padding:20px}.article-modern h1{font-size:33px}.article-copy .content{font-size:14px}.player-inner{grid-template-columns:minmax(0,1fr) auto}.now-copy{min-width:0}.player-program{max-width:190px}.eq{display:none}}
 @media(max-width:420px){.quick-grid{grid-template-columns:1fr}.featured-news{min-height:360px}.featured-content{left:18px;right:18px;bottom:18px}.featured-content h3{font-size:21px}.player-program{max-width:145px}.now strong{font-size:11px}}
+
+/* ===== AJUSTE FINAL: ENCABEZADO + PIE DE PÁGINA ===== */
+:root{
+  --vr-navy-1:#03111f;
+  --vr-navy-2:#082b4a;
+  --vr-blue:#0b5f9e;
+}
+
+/* Encabezado con fondo azul oscuro degradado para resaltar el logo */
+.site-header{
+  background:linear-gradient(135deg,var(--vr-navy-1) 0%,#06213a 48%,#0a3c63 100%) !important;
+  border-bottom:1px solid rgba(255,255,255,.10) !important;
+  box-shadow:0 8px 26px rgba(2,15,29,.22) !important;
+}
+.site-header .nav-wrap{
+  min-height:88px;
+}
+.site-header .brand{
+  padding:6px 12px 6px 6px;
+  border-radius:18px;
+  background:linear-gradient(135deg,rgba(3,17,31,.92),rgba(8,43,74,.78));
+  border:1px solid rgba(105,190,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 28px rgba(0,0,0,.18);
+}
+.site-header .logo-box{
+  width:70px;
+  height:70px;
+  border-radius:15px;
+  background:linear-gradient(145deg,#071321 0%,#0b3153 55%,#0a5a8d 100%) !important;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10);
+}
+.site-header .logo-box img{
+  width:62px;
+  height:62px;
+  object-fit:contain;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.35));
+}
+.site-header .brand-copy strong{
+  color:#fff;
+  letter-spacing:1.5px;
+}
+.site-header .brand-copy small{
+  color:#62c5ff;
+  text-shadow:0 0 14px rgba(98,197,255,.25);
+}
+.site-header nav a{
+  color:#eef8ff !important;
+}
+.site-header nav a:hover{
+  background:rgba(255,255,255,.10) !important;
+  color:#fff !important;
+}
+.site-header nav .admin-link{
+  background:linear-gradient(135deg,#0b78bd,#075184) !important;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 7px 18px rgba(3,44,76,.28);
+}
+.site-header .menu-toggle{
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.14);
+}
+
+/* El pie nunca queda tapado por el reproductor fijo */
+body{
+  padding-bottom:170px !important;
+}
+.footer{
+  position:relative;
+  padding-bottom:18px;
+  background:linear-gradient(145deg,#04111e 0%,#071b2d 55%,#082b49 100%) !important;
+  border-top:1px solid rgba(92,190,255,.20);
+}
+.footer-grid{
+  padding:48px 0 34px;
+}
+.footer-bottom{
+  position:relative;
+  z-index:1;
+  padding:20px 16px 22px;
+  margin:0;
+  color:#c9d8e5;
+  background:rgba(0,0,0,.10);
+}
+.footer-bottom strong{
+  color:#fff;
+}
+.footer a{
+  color:#eaf6ff !important;
+}
+.footer a:hover{
+  color:#63c7ff !important;
+}
+
+/* Más espacio visual entre el contenido y el reproductor */
+.player{
+  min-height:92px;
+}
+@media(max-width:850px){
+  body{padding-bottom:125px !important}
+  .footer-grid{padding-bottom:28px}
+  .footer-bottom{padding-bottom:20px}
+}
