@@ -108,3 +108,31 @@ create index if not exists programs_date_start_idx on public.programs (program_d
 -- 2. Usa ese correo y contraseña en "Iniciar sesión" de la web.
 -- 3. Si aparece "Email not confirmed", confirma el usuario en Authentication > Users.
 -- 4. NO pongas una service_role key en config.js.
+
+
+-- ALMACENAMIENTO PARA IMÁGENES DE NOTICIAS
+-- Crea un bucket público para que las portadas puedan verse en la web.
+insert into storage.buckets (id, name, public)
+values ('news-images', 'news-images', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public read news images" on storage.objects;
+create policy "Public read news images" on storage.objects
+  for select to public
+  using (bucket_id = 'news-images');
+
+drop policy if exists "Authenticated upload news images" on storage.objects;
+create policy "Authenticated upload news images" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'news-images');
+
+drop policy if exists "Authenticated update news images" on storage.objects;
+create policy "Authenticated update news images" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'news-images')
+  with check (bucket_id = 'news-images');
+
+drop policy if exists "Authenticated delete news images" on storage.objects;
+create policy "Authenticated delete news images" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'news-images');

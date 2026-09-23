@@ -174,6 +174,37 @@ function friendlyAuthError(error){
   return m;
 }
 
+
+
+async function uploadNewsImage(file, statusEl){
+  if(!file) return null;
+  if(!file.type.startsWith('image/')) throw new Error('Selecciona un archivo de imagen (JPG, PNG, WEBP, GIF).');
+  if(file.size > 5 * 1024 * 1024) throw new Error('La imagen no puede superar 5 MB.');
+  const session = await currentSession();
+  if(!session) throw new Error('Tu sesión de administrador no está activa.');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const path = `news/${crypto.randomUUID()}.${ext}`;
+  if(statusEl) statusEl.textContent='Subiendo imagen…';
+  const up = await sb.storage.from('news-images').upload(path, file, { upsert:false, contentType:file.type, cacheControl:'3600' });
+  if(up.error) throw up.error;
+  const pub = sb.storage.from('news-images').getPublicUrl(path);
+  if(statusEl) statusEl.textContent='✓ Imagen subida correctamente.';
+  return pub.data.publicUrl;
+}
+
+function bindNewsImageUpload(inputId, buttonId, urlId, statusId, previewId){
+  const input=document.querySelector(inputId), button=document.querySelector(buttonId), url=document.querySelector(urlId), status=document.querySelector(statusId), preview=document.querySelector(previewId);
+  if(!input||!button) return;
+  button.onclick=()=>input.click();
+  input.onchange=async()=>{
+    const file=input.files?.[0]; if(!file) return;
+    try{
+      if(preview){preview.src=URL.createObjectURL(file); preview.style.display='block';}
+      const u=await uploadNewsImage(file,status); if(u) url.value=u;
+    }catch(err){ if(status) status.textContent='No se pudo subir: '+(err.message||err); }
+  };
+}
+
 async function saveNews(payload){
   const session = await currentSession();
   if(!session) return { error: { message: 'Tu sesión de administrador no está activa. Vuelve a Iniciar sesión.' } };
@@ -227,13 +258,15 @@ async function editNews(id){
   const r=await sb.from('news').select('*').eq('id',id).maybeSingle();
   if(r.error||!r.data){alert(r.error?.message||'No se encontró la noticia.');return;}
   const n=r.data;
-  app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Editar noticia</h1><form id="newsEditForm"><label>Título</label><input id="nt" value="${esc(n.title)}" required><label>Slug (URL)</label><input id="ns" value="${esc(n.slug||'')}"><label>Categoría</label><input id="nc" value="${esc(n.category||'Noticias')}"><label>Resumen</label><textarea id="nr">${esc(n.summary||'')}</textarea><label>Contenido</label><textarea id="nco" required>${esc(n.content||'')}</textarea><label>URL de imagen</label><input id="ni" type="url" value="${esc(n.image_url||'')}"><label>URL de video (opcional)</label><input id="nv" type="url" value="${esc(n.video_url||'')}"><div class="form-actions"><button class="btn btn-primary">Guardar cambios</button><a class="btn" href="#admin">Cancelar</a></div><p id="msg" class="muted"></p></form></div></div></section>`;
-  document.querySelector('#newsEditForm').onsubmit=async e=>{e.preventDefault();const slug=document.querySelector('#ns').value.trim()||slugify(document.querySelector('#nt').value);const u={title:document.querySelector('#nt').value,slug,category:document.querySelector('#nc').value,summary:document.querySelector('#nr').value,content:document.querySelector('#nco').value,image_url:document.querySelector('#ni').value,video_url:document.querySelector('#nv').value};const x=await sb.from('news').update(u).eq('id',id);document.querySelector('#msg').textContent=x.error?x.error.message:'Cambios guardados correctamente.';if(!x.error)setTimeout(admin,600);};
+  app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Editar noticia</h1><form id="newsEditForm"><label>Título</label><input id="nt" value="${esc(n.title)}" required><label>Slug (URL)</label><input id="ns" value="${esc(n.slug||'')}"><label>Categoría</label><input id="nc" value="${esc(n.category||'Noticias')}"><label>Resumen</label><textarea id="nr">${esc(n.summary||'')}</textarea><label>Contenido</label><textarea id="nco" required>${esc(n.content||'')}</textarea><label>Imagen de portada</label><div class="upload-row"><button type="button" class="btn btn-upload" id="editImageBtn">📷 Subir imagen</button><input id="editImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden></div><input id="ni" type="url" value="${esc(n.image_url||'')}" placeholder="O pega aquí la URL de una imagen"><div class="upload-status" id="editUploadStatus">${n.image_url?'Imagen actual cargada.':''}</div><img id="editPreview" class="image-preview" src="${esc(n.image_url||'')}" style="${n.image_url?'display:block':'display:none'}" alt="Vista previa"><label>URL de video (opcional)</label><input id="nv" type="url" value="${esc(n.video_url||'')}"><div class="form-actions"><button class="btn btn-primary">Guardar cambios</button><a class="btn" href="#admin">Cancelar</a></div><p id="msg" class="muted"></p></form></div></div></section>`;
+  bindNewsImageUpload('#editImageFile','#editImageBtn','#ni','#editUploadStatus','#editPreview');
+  document.querySelector('#newsEditForm').onsubmit=async e=>{e.preventDefault();const slug=document.querySelector('#ns').value.trim()||slugify(document.querySelector('#nt').value);const u={title:document.querySelector('#nt').value,slug,category:document.querySelector('#nc').value,summary:document.querySelector('#nr').value,content:document.querySelector('#nco').value,image_url:document.querySelector('#ni').value.trim()||null,video_url:document.querySelector('#nv').value.trim()||null};const x=await sb.from('news').update(u).eq('id',id);document.querySelector('#msg').textContent=x.error?x.error.message:'Cambios guardados correctamente.';if(!x.error)setTimeout(admin,600);};
 }
 
 async function adminNews(){
   if(!(await currentSession())) return admin();
-  app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Publicar noticia</h1><form id="newsForm"><label>Título</label><input id="nt" required><label>Slug (URL)</label><input id="ns" placeholder="mi-noticia"><label>Categoría</label><input id="nc" value="Noticias"><label>Resumen</label><textarea id="nr"></textarea><label>Contenido</label><textarea id="nco" required></textarea><label>URL de imagen</label><input id="ni" type="url"><label>URL de video (opcional)</label><input id="nv" type="url"><div class="form-actions"><button class="btn btn-primary">Publicar</button><a class="btn" href="#admin">Volver al administrador</a></div><p id="msg" class="muted"></p></form></div></div></section>`;
+  app.innerHTML=`<section class="page"><div class="container"><div class="form-card"><span class="kicker">Administrador</span><h1>Publicar noticia</h1><form id="newsForm"><label>Título</label><input id="nt" required><label>Slug (URL)</label><input id="ns" placeholder="mi-noticia"><label>Categoría</label><input id="nc" value="Noticias"><label>Resumen</label><textarea id="nr"></textarea><label>Contenido</label><textarea id="nco" required></textarea><label>Imagen de portada</label><div class="upload-row"><button type="button" class="btn btn-upload" id="newsImageBtn">📷 Subir imagen</button><input id="newsImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden></div><input id="ni" type="url" placeholder="O pega aquí la URL de una imagen"><div class="upload-status" id="newsUploadStatus">Formatos: JPG, PNG, WEBP o GIF · máximo 5 MB.</div><img id="newsPreview" class="image-preview" style="display:none" alt="Vista previa"><label>URL de video (opcional)</label><input id="nv" type="url"><div class="form-actions"><button class="btn btn-primary">Publicar</button><a class="btn" href="#admin">Volver al administrador</a></div><p id="msg" class="muted"></p></form></div></div></section>`;
+  bindNewsImageUpload('#newsImageFile','#newsImageBtn','#ni','#newsUploadStatus','#newsPreview');
   document.querySelector('#newsForm').onsubmit=async e=>{e.preventDefault();const title=document.querySelector('#nt').value.trim();const slug=document.querySelector('#ns').value.trim()||slugify(title);const r=await saveNews({title,slug,category:document.querySelector('#nc').value.trim()||'Noticias',summary:document.querySelector('#nr').value.trim(),content:document.querySelector('#nco').value.trim(),image_url:document.querySelector('#ni').value.trim()||null,video_url:document.querySelector('#nv').value.trim()||null,published_at:new Date().toISOString()});
     document.querySelector('#msg').textContent=r.error?('No se pudo publicar: '+friendlyAuthError(r.error)):'✅ Noticia publicada correctamente. Ya aparece en Noticias y en el administrador.';
     if(!r.error) setTimeout(admin,900);};

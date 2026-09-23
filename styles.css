@@ -503,3 +503,11 @@ body{
   .footer-grid{padding-bottom:28px}
   .footer-bottom{padding-bottom:20px}
 }
+
+
+/* Carga de imágenes de noticias */
+.upload-row{display:flex;gap:10px;align-items:center;margin:8px 0 10px}
+.btn-upload{background:#0b2942!important;color:#fff!important;border:1px solid #1d547b!important}
+.btn-upload:hover{background:#123b5d!important;transform:translateY(-1px)}
+.upload-status{font-size:.86rem;color:#687887;margin:6px 0 10px;min-height:20px}
+.image-preview{width:min(100%,420px);max-height:260px;object-fit:cover;border-radius:14px;border:1px solid #dce4ea;margin:8px 0 16px;box-shadow:0 10px 28px rgba(5,20,35,.12)}
