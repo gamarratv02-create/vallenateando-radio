@@ -511,3 +511,97 @@ body{
 .btn-upload:hover{background:#123b5d!important;transform:translateY(-1px)}
 .upload-status{font-size:.86rem;color:#687887;margin:6px 0 10px;min-height:20px}
 .image-preview{width:min(100%,420px);max-height:260px;object-fit:cover;border-radius:14px;border:1px solid #dce4ea;margin:8px 0 16px;box-shadow:0 10px 28px rgba(5,20,35,.12)}
+
+
+/* Logo solicitado en el encabezado y barra de búsqueda */
+.site-header .brand .logo-box{
+  background:linear-gradient(145deg,#061321 0%,#0b2d49 52%,#0a476d 100%) !important;
+  border:1px solid rgba(105,190,255,.24) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+.site-header .brand .logo-box img{
+  width:62px;height:62px;object-fit:cover;border-radius:12px;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.32));
+}
+.news-search-wrap{
+  margin-top:22px;
+  width:100%;
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 16px 8px 8px;
+  background:linear-gradient(135deg,#071522,#0b2942);
+  border:1px solid rgba(75,170,230,.28);
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(7,21,33,.14), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.news-search-logo{
+  width:50px;height:50px;flex:0 0 50px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(145deg,#061321,#0b4165);
+  border:1px solid rgba(255,255,255,.18);
+  display:grid;place-items:center;
+  box-shadow:0 6px 16px rgba(0,0,0,.22);
+}
+.news-search-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.news-search-icon{font-size:28px;line-height:1;color:#74d0ff;opacity:.95}
+.news-search-wrap input{
+  flex:1;min-width:0;border:0 !important;outline:0 !important;background:transparent !important;
+  color:#fff !important;font-size:15px !important;padding:14px 4px !important;
+  box-shadow:none !important;
+}
+.news-search-wrap input::placeholder{color:#b7c9d7}
+.news-search-wrap:focus-within{border-color:rgba(98,197,255,.62);box-shadow:0 16px 38px rgba(7,21,33,.18),0 0 0 3px rgba(98,197,255,.10)}
+@media(max-width:560px){
+  .news-search-wrap{min-height:60px;border-radius:15px;padding-right:12px}
+  .news-search-logo{width:42px;height:42px;flex-basis:42px;border-radius:10px}
+  .news-search-icon{font-size:24px}
+  .news-search-wrap input{font-size:13px !important}
+}
+
+
+/* ===== PORTADA: ETIQUETAS DE NOTICIAS TIPO PORTAL INFORMATIVO ===== */
+.news-category-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+  max-width:980px;
+}
+.news-tab{
+  appearance:none;
+  border:1px solid #d9e2ea;
+  background:#fff;
+  color:#20384f;
+  border-radius:999px;
+  padding:7px 13px;
+  font:700 10px/1 Montserrat,Arial,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.35px;
+  cursor:pointer;
+  transition:all .2s ease;
+  white-space:nowrap;
+}
+.news-tab:hover{
+  border-color:#0879bd;
+  color:#0879bd;
+  transform:translateY(-1px);
+}
+.news-tab.active{
+  background:#082038;
+  color:#fff;
+  border-color:#082038;
+  box-shadow:0 5px 14px rgba(8,32,56,.18);
+}
+.news-section .section-head{align-items:flex-start}
+.news-section .section-head > div{min-width:0}
+.news-showcase{margin-top:20px}
+.featured-news{min-height:420px}
+.secondary-card{min-height:0}
+@media(max-width:700px){
+  .news-category-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:7px;scrollbar-width:none}
+  .news-category-tabs::-webkit-scrollbar{display:none}
+  .news-tab{flex:0 0 auto}
+  .news-section .section-head{display:block}
+  .news-section .section-head .btn{margin-top:14px}
+}
