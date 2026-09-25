@@ -28,3 +28,7 @@ Rediseño orientado a emisora online: identidad visual consistente, portada edit
 
 ## Subir imágenes de noticias
 En el administrador, 'Subir imagen' abre el selector de archivos. La imagen se guarda en el bucket público `news-images` de Supabase y su URL queda guardada en la noticia. Ejecuta la versión actualizada de `setup.sql` en Supabase una vez para crear el bucket y sus políticas.
+
+
+## Diseño profesional
+Esta versión incorpora una portada editorial de radio online, navegación rápida, noticias destacadas con etiquetas, programación del día, contacto comercial y reproductor inferior persistente.
