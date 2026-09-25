@@ -107,26 +107,39 @@ async function home(){
   const [nr, pr] = await Promise.all([getNews(), getPrograms()]);
   const items = nr.data || [];
   const featured = items[0];
-  const secondary = items.slice(1,5);
-  const newsHtml = nr.error ? newsError(nr.error) : (featured ? `
-    <div class="news-showcase">
-      <a class="featured-news" href="#/noticia/${encodeURIComponent(featured.slug || featured.id)}">
-        <div class="featured-media"><img src="${esc(featured.image_url || C.logoUrl)}" alt="${esc(featured.title || 'Noticia destacada')}" loading="eager" onerror="this.src='${esc(C.logoUrl)}'"></div>
-        <div class="featured-overlay"></div>
-        <div class="featured-content"><span class="tag">${esc(featured.category || 'Noticias')}</span><h3>${esc(featured.title || 'Sin título')}</h3><p>${esc(featured.summary || featured.content || '')}</p><small>${esc(fmtDate(featured.published_at || featured.created_at))}</small></div>
+  const secondary = items.slice(1,3);
+  const latest = items.slice(0,8);
+  const categories = [...new Set(items.map(n=>String(n.category||'Noticias').trim()).filter(Boolean))].slice(0,8);
+
+  const featureHtml = nr.error ? newsError(nr.error) : (featured ? `
+    <div class="news-portal-lead">
+      <a class="portal-featured" href="#/noticia/${encodeURIComponent(featured.slug || featured.id)}">
+        <div class="portal-featured-media"><img src="${esc(featured.image_url || C.logoUrl)}" alt="${esc(featured.title || 'Noticia destacada')}" loading="eager" onerror="this.src='${esc(C.logoUrl)}'"></div>
+        <div class="portal-featured-overlay"></div>
+        <div class="portal-featured-content"><span class="tag">${esc(featured.category || 'Noticias')}</span><h3>${esc(featured.title || 'Sin título')}</h3><p>${esc(featured.summary || featured.content || '')}</p><small>${esc(fmtDate(featured.published_at || featured.created_at))}</small></div>
       </a>
-      <div class="secondary-news">${secondary.map(n=>`<a class="secondary-card" href="#/noticia/${encodeURIComponent(n.slug || n.id)}"><div class="secondary-media"><img src="${esc(n.image_url || C.logoUrl)}" alt="${esc(n.title || 'Noticia')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="secondary-body"><span class="tag">${esc(n.category || 'Noticias')}</span><h3>${esc(n.title || 'Sin título')}</h3><small>${esc(fmtDate(n.published_at || n.created_at))}</small></div></a>`).join('')}</div>
+      <div class="portal-side-news">
+        ${secondary.map(n=>`<a class="portal-side-card" href="#/noticia/${encodeURIComponent(n.slug || n.id)}"><div class="portal-side-media"><img src="${esc(n.image_url || C.logoUrl)}" alt="${esc(n.title || 'Noticia')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="portal-side-overlay"></div><div class="portal-side-content"><span class="tag">${esc(n.category || 'Noticias')}</span><h3>${esc(n.title || 'Sin título')}</h3><small>${esc(fmtDate(n.published_at || n.created_at))}</small></div></a>`).join('')}
+      </div>
     </div>` : `<div class="empty">Todavía no hay noticias publicadas.</div>`);
+
+  const latestHtml = latest.length ? `<div class="latest-news-strip">${latest.map(n=>`<a class="latest-card" href="#/noticia/${encodeURIComponent(n.slug || n.id)}"><div class="latest-image"><img src="${esc(n.image_url || C.logoUrl)}" alt="${esc(n.title || 'Noticia')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="latest-body"><span class="tag">${esc(n.category || 'Noticias')}</span><h3>${esc(n.title || 'Sin título')}</h3><p>${esc(n.summary || n.content || '')}</p><small>${esc(fmtDate(n.published_at || n.created_at))}</small><span class="read-more">LEER NOTICIA ↗</span></div></a>`).join('')}</div>` : `<div class="empty">Todavía no hay noticias publicadas.</div>`;
+
+  const categoryBlocks = categories.map(cat=>{
+    const catItems=items.filter(n=>String(n.category||'Noticias').trim().toLowerCase()===cat.toLowerCase()).slice(0,4);
+    if(!catItems.length) return '';
+    return `<section class="category-news-block"><div class="category-news-head"><div><span>GTV NOTICIAS</span><h3>${esc(cat)}</h3></div><a href="#noticias">VER TODAS →</a></div><div class="category-news-grid">${catItems.map(n=>`<a class="category-news-card" href="#/noticia/${encodeURIComponent(n.slug || n.id)}"><div class="category-image"><img src="${esc(n.image_url || C.logoUrl)}" alt="${esc(n.title || 'Noticia')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="category-body"><span class="tag">${esc(n.category || cat)}</span><h4>${esc(n.title || 'Sin título')}</h4><p>${esc(n.summary || n.content || '')}</p><small>${esc(fmtDate(n.published_at || n.created_at))}</small><span class="read-more">LEER NOTICIA</span><span class="circle-arrow">→</span></div></a>`).join('')}</div></section>`;
+  }).join('');
+
   app.innerHTML = `<section class="hero"><div class="container hero-grid"><div class="hero-copy"><div class="hero-status"><span class="hero-live-dot"></span> TRANSMISIÓN EN VIVO · 24/7</div><h1>Vallenateando<br><em>Radio</em></h1><p>El sonido del vallenato, la música que nos conecta y la información que necesitas. Escúchanos en vivo desde cualquier lugar.</p><div class="hero-actions"><button class="btn btn-primary" id="heroPlay"><span>▶</span> Escuchar en vivo</button><a class="btn btn-ghost" href="#programacion">Ver programación <span>→</span></a></div><div class="hero-trust"><span>● Señal online</span><span>● Música 24/7</span><span>● Noticias</span></div></div><div class="hero-art"><div class="hero-art-glow"></div><img src="${esc(C.logoUrl)}" alt="Vallenateando Radio"><div class="hero-art-label"><span>ON AIR</span><strong>VALLENATEANDO</strong></div></div></div></section>
   <section class="quick-bar"><div class="container quick-grid"><a href="#en-vivo"><span class="quick-icon">▶</span><span><b>Escucha en vivo</b><small>Señal 24/7</small></span></a><a href="#programacion"><span class="quick-icon">◷</span><span><b>Programación</b><small>Consulta la agenda de hoy</small></span></a><a href="#noticias"><span class="quick-icon">✦</span><span><b>Últimas noticias</b><small>Información y actualidad</small></span></a><a href="#contacto"><span class="quick-icon">✆</span><span><b>Contáctanos</b><small>Publicidad y alianzas</small></span></a></div></section>
   <section class="section live-section"><div class="container"><div class="live-card premium-live"><div class="live-card-copy"><span class="live-badge">EN DIRECTO AHORA</span><h2>Vallenateando Radio</h2><p>Activa el reproductor inferior y continúa escuchando mientras recorres todas las páginas.</p><div class="signal-pills"><span>● Señal estable</span><span>24 horas</span><span>7 días</span></div></div><button class="big-play" id="heroBigPlay" aria-label="Escuchar en vivo">▶</button></div></div></section>
-  <section class="section news-section"><div class="container"><div class="section-head"><div><p>ACTUALIDAD</p><h2>Noticias de Vallenateando Radio</h2><div class="news-category-tabs" id="homeNewsTabs"><button class="news-tab active" data-category="Todas">Todas</button>${[...new Set(items.map(n=>String(n.category||'Noticias').trim()).filter(Boolean))].slice(0,10).map(cat=>`<button class="news-tab" data-category="${esc(cat)}">${esc(cat)}</button>`).join('')}</div></div><a class="btn btn-outline" href="#noticias">Ver todas las noticias <span>→</span></a></div><div id="homeNewsResults">${newsHtml}</div></div></section>
+  <section class="section news-section news-portal"><div class="container"><div class="portal-heading"><div><span class="portal-kicker">VALLENATEANDO RADIO</span><h2>Noticias, música y actualidad</h2><p>Información, cultura y entretenimiento para nuestra audiencia.</p></div><a class="btn btn-outline" href="#noticias">Ver todas las noticias →</a></div><div class="news-category-tabs" id="homeNewsTabs"><button class="news-tab active" data-category="Todas">Todas</button>${categories.map(cat=>`<button class="news-tab" data-category="${esc(cat)}">${esc(cat)}</button>`).join('')}</div><div id="homeNewsResults">${featureHtml}</div><div class="portal-section-title"><div><span>VALLENATEANDO RADIO</span><h3>Últimas noticias</h3><p>Las noticias más recientes publicadas por nuestra emisora.</p></div><div class="portal-arrows"><button type="button" aria-label="Anterior">←</button><button type="button" aria-label="Siguiente">→</button></div></div>${latestHtml}${categoryBlocks}</div></section>
   <section class="section schedule-section"><div class="container"><div class="section-head"><div><p>HOY EN LA EMISORA</p><h2>Programación de hoy</h2></div><a class="btn btn-outline" href="#programacion">Ver agenda completa <span>→</span></a></div>${programs(pr.data)}</div></section>
   <section class="section contact-section"><div class="container"><div class="contact-box premium-contact"><div><span class="kicker">Hablemos</span><h2>¿Quieres anunciarte en Vallenateando Radio?</h2><p>Contáctanos para publicidad, alianzas, contenidos y propuestas comerciales.</p></div><div class="contact-actions"><a class="contact-item" href="https://wa.me/573013799517" target="_blank" rel="noopener"><span>📱</span><div><small>WhatsApp / Teléfono</small><strong>${esc(C.contactPhone)}</strong></div></a><a class="contact-item" href="mailto:${esc(C.contactEmail)}"><span>✉</span><div><small>Correo electrónico</small><strong>${esc(C.contactEmail)}</strong></div></a></div></div></div></section>`;
   document.querySelector('#heroPlay')?.addEventListener('click', toggle);
   document.querySelector('#heroBigPlay')?.addEventListener('click', toggle);
 
-  // Filtros de noticias en la portada, estilo portal informativo
   const tabs = document.querySelectorAll('#homeNewsTabs .news-tab');
   const results = document.querySelector('#homeNewsResults');
   tabs.forEach(tab => tab.addEventListener('click', () => {
@@ -134,13 +147,10 @@ async function home(){
     tab.classList.add('active');
     const category = tab.dataset.category;
     const filtered = category === 'Todas' ? items : items.filter(n => String(n.category || 'Noticias').trim().toLowerCase() === category.toLowerCase());
-    if (!filtered.length) {
-      results.innerHTML = '<div class=\"empty\">No hay noticias publicadas en esta categoría.</div>';
-      return;
-    }
+    if (!filtered.length) { results.innerHTML = '<div class="empty">No hay noticias publicadas en esta categoría.</div>'; return; }
     const f = filtered[0];
-    const rest = filtered.slice(1,5);
-    results.innerHTML = `<div class=\"news-showcase\"><a class=\"featured-news\" href=\"#/noticia/${encodeURIComponent(f.slug || f.id)}\"><div class=\"featured-media\"><img src=\"${esc(f.image_url || C.logoUrl)}\" alt=\"${esc(f.title || 'Noticia destacada')}\" loading=\"lazy\" onerror=\"this.src='${esc(C.logoUrl)}'\"></div><div class=\"featured-overlay\"></div><div class=\"featured-content\"><span class=\"tag\">${esc(f.category || 'Noticias')}</span><h3>${esc(f.title || 'Sin título')}</h3><p>${esc(f.summary || f.content || '')}</p><small>${esc(fmtDate(f.published_at || f.created_at))}</small></div></a><div class=\"secondary-news\">${rest.map(n=>`<a class=\"secondary-card\" href=\"#/noticia/${encodeURIComponent(n.slug || n.id)}\"><div class=\"secondary-media\"><img src=\"${esc(n.image_url || C.logoUrl)}\" alt=\"${esc(n.title || 'Noticia')}\" loading=\"lazy\" onerror=\"this.src='${esc(C.logoUrl)}'\"></div><div class=\"secondary-body\"><span class=\"tag\">${esc(n.category || 'Noticias')}</span><h3>${esc(n.title || 'Sin título')}</h3><small>${esc(fmtDate(n.published_at || n.created_at))}</small></div></a>`).join('')}</div></div>`;
+    const rest = filtered.slice(1,3);
+    results.innerHTML = `<div class="news-portal-lead"><a class="portal-featured" href="#/noticia/${encodeURIComponent(f.slug || f.id)}"><div class="portal-featured-media"><img src="${esc(f.image_url || C.logoUrl)}" alt="${esc(f.title || 'Noticia destacada')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="portal-featured-overlay"></div><div class="portal-featured-content"><span class="tag">${esc(f.category || 'Noticias')}</span><h3>${esc(f.title || 'Sin título')}</h3><p>${esc(f.summary || f.content || '')}</p><small>${esc(fmtDate(f.published_at || f.created_at))}</small></div></a><div class="portal-side-news">${rest.map(n=>`<a class="portal-side-card" href="#/noticia/${encodeURIComponent(n.slug || n.id)}"><div class="portal-side-media"><img src="${esc(n.image_url || C.logoUrl)}" alt="${esc(n.title || 'Noticia')}" loading="lazy" onerror="this.src='${esc(C.logoUrl)}'"></div><div class="portal-side-overlay"></div><div class="portal-side-content"><span class="tag">${esc(n.category || 'Noticias')}</span><h3>${esc(n.title || 'Sin título')}</h3><small>${esc(fmtDate(n.published_at || n.created_at))}</small></div></a>`).join('')}</div></div>`;
   }));
 }
 
